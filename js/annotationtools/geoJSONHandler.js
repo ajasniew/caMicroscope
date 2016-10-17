@@ -309,8 +309,15 @@ annotools.prototype.generateSVG = function (annotations) {
       //svgHtml += '" style="fill: transparent; stroke: lime; stroke-width:2.5"/>'
       if(color === undefined)
         color = 'lime'
-      svgHtml += '" style="fill:transparent; stroke:'+color+ '; stroke-width:2.5"/>'
+      //svgHtml += '" style="fill:transparent; stroke:'+color+ '; stroke-width:2.5"/>'
+      //svgHtml += '" style="fill:' + '#feedde' + ';fill-opacity: 0.6;stroke-width:0"/>';
+      console.log(this.heatmap_opacity);
+      svgHtml += '" style="fill:' + '#feedde' + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
     }
+
+    //Debug
+    //console.log(svgHtml);
+
     this.svg = new Element('div', {
       styles: {
         position: 'absolute',

@@ -12,6 +12,7 @@ var ToolBar = function (element, options) {
 
   this.iid = options.iid || null
   this.annotationActive = isAnnotationActive()
+
 }
 ToolBar.prototype.showMessage = function (msg) {
   console.log(msg)
@@ -284,6 +285,22 @@ ToolBar.prototype.createButtons = function () {
         'id': 'drawDotButton'
     });
     tool.append(this.dotToolButton); // Dot Tool
+
+    this.heatUpButton = jQuery('<img>', {
+	'title': 'Increase opacity',
+	'class': 'toolButton inactive',
+	'src': 'images/ellipse.svg',
+	'id': 'heatUpButton',
+    });
+    tool.append(this.heatUpButton);	// Button for increasing opacity
+
+    this.heatDownButton = jQuery('<img>', {
+        'title': 'Decrease opacity',
+        'class': 'toolButton inactive',
+        'src': 'images/ellipse.svg',
+        'id': 'heatDownButton',
+    });
+    tool.append(this.heatDownButton);     // Button for decreasing opacity
 	
    
     /*
@@ -377,6 +394,18 @@ ToolBar.prototype.createButtons = function () {
       this.FilterTools.showFilterControls()
     }.bind(this))
 	*/
+
+    this.heatUpButton.on('click', function () {
+	this.annotools.heatmap_opacity = Math.min(1, this.annotools.heatmap_opacity + 0.1);
+	this.annotools.getMultiAnnot();
+    }.bind(this))
+
+    this.heatDownButton.on('click', function () {
+	this.annotools.heatmap_opacity = Math.max(0, this.annotools.heatmap_opacity - 0.1);
+	this.annotools.getMultiAnnot();
+    }.bind(this))
+
+
     var toolButtons = jQuery('.toolButton')
     toolButtons.each(function () {
       jQuery(this).on({
