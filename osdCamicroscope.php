@@ -93,7 +93,8 @@
   right: 0;
 }
         </style>
-         <link rel="stylesheet" type="text/css" media="all" href="css/annotools.css" />   
+         <link rel="stylesheet" type="text/css" media="all" href="css/annotools.css" /> 
+	 <link rel="stylesheet" type="text/css" media="all" href="css/multiheattools.css" />
     </head>
 
     <body>
@@ -102,6 +103,8 @@
                     
             <div id="tool"></div>
             <div id="panel"></div>
+	    <!-- <div id="weightpanel"><div id="slide"></div></div> -->
+	    <div id="weightpanel"><div id="bar1" class="bar"><div id="slide1" class="slide"></div></div></div>
         <div id="algosel"><div id="tree"></div></div>
 
             <div class="demoarea">

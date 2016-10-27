@@ -311,8 +311,42 @@ annotools.prototype.generateSVG = function (annotations) {
         color = 'lime'
       //svgHtml += '" style="fill:transparent; stroke:'+color+ '; stroke-width:2.5"/>'
       //svgHtml += '" style="fill:' + '#feedde' + ';fill-opacity: 0.6;stroke-width:0"/>';
-      console.log(this.heatmap_opacity);
-      svgHtml += '" style="fill:' + '#feedde' + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+      //console.log(this.heatmap_opacity);
+      switch (annotation.object_type)
+      {
+	case 'heatmap':
+		var heatmapIndex = parseInt(parseInt((annotation.properties.metric_value * 10))/2.5);
+		var heatcolor = this.heatmapColor[heatmapIndex];
+		svgHtml += '" style="fill:' + heatcolor.toString() + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+		break;
+	case 'heatmap_multiple':
+		var lym_score = annotation.properties.multiheat_param.metric_array[0];
+		var nec_score = annotation.properties.multiheat_param.metric_array[1];
+		var nec_weight = annotation.properties.multiheat_param.weight_array[1];
+		var combo = lym_score;
+		if (nec_score >= (1-this.heat_weight1))
+		{
+			combo = 0;
+		}
+		var heatmapIndex = parseInt(parseInt((combo * 10))/2.5);
+                var heatcolor = this.heatmapColor[heatmapIndex];
+                svgHtml += '" style="fill:' + heatcolor.toString() + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+                break;
+	default:
+		svgHtml += '" style="fill:transparent; stroke:'+color+ '; stroke-width:2.5"/>'
+      }
+      /*
+      if (annotation.object_type === 'heatmap')
+      {
+      	var heatmapIndex = parseInt(parseInt((annotation.properties.metric_value * 10))/2.5);
+      	var heatcolor = this.heatmapColor[heatmapIndex];
+      	svgHtml += '" style="fill:' + heatcolor.toString() + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+      }
+      else
+      {
+	svgHtml += '" style="fill:transparent; stroke:'+color+ '; stroke-width:2.5"/>'
+      }
+      */
     }
 
     //Debug

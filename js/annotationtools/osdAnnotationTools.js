@@ -37,6 +37,18 @@ var annotools = function (options) {
   this.y2 = 1.0
 
   this.annotationHandler = options.annotationHandler || new AnnotoolsOpenSeadragonHandler()
+  // Added variables and event handler
+  this.heatmap_opacity = 0.4;
+  //this.heatmapColor = ['#bd0026','#fd8d3c','#fecc5c','#feedde'];
+  this.heatmapColor = ['#feedde','#fecc5c','#fd8d3c','#bd0026'];
+  this.heat_weight1 = 0.5;
+  bar_var1 = document.getElementById('bar1');
+  slide_var1 = document.getElementById('slide1');
+  bar_click1 = false;
+  bar_var1.addEventListener('mousedown', this.barMouseDown, false);
+  bar_var1.addEventListener('mouseup', this.barMouseUp.bind(this), false);
+  bar_var1.addEventListener('mousemove', this.barMouseSlide, false);
+
   /*
    * OpenSeaDragon events
    */
@@ -1532,7 +1544,6 @@ annotools.prototype.drawPencil = function (ctx) {
       points = points.slice(0, -1)
       points += ';'
     }
-
     points = points.slice(0, -1)
 
     var newAnnot = {
@@ -1563,7 +1574,7 @@ annotools.prototype.drawPencil = function (ctx) {
     /* Change button back to inactive*/
     jQuery("canvas").css("cursor", "default");
     jQuery("#drawFreelineButton").removeClass("active");
-
+    console.log('end of mouse up');
 
   }.bind(this))
 }
@@ -2886,3 +2897,33 @@ annotools.prototype.promptForDownload = function(newAnnot, mode, annotools, ctx)
 
 }
 
+annotools.prototype.barMouseDown = function(event)
+{
+	console.log('bar_mousedown');
+	var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+	//this.bar_var1.addEventListener('mousemove', this.barMouseSlide, false);
+	bar_click1 = true;
+	slide_var1.style.width = (set_perc * 100) + '%';
+}
+
+annotools.prototype.barMouseUp = function(event)
+{
+	var self = this;
+        console.log('bar_mouseup');
+	bar_click1 = false;
+	//bar_var1.removeEventListener('mousemove', this.barMouseSlide, false);
+	var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+	this.heat_weight1 = set_perc;
+	console.log(set_perc);
+	self.getMultiAnnot();
+}
+
+annotools.prototype.barMouseSlide = function(event)
+{
+	if (bar_click1 == true)
+	{
+        	console.log('bar_mouseslide');
+		var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+		slide_var1.style.width = (set_perc * 100) + '%';
+	}
+}

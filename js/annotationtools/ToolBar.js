@@ -301,6 +301,14 @@ ToolBar.prototype.createButtons = function () {
         'id': 'heatDownButton',
     });
     tool.append(this.heatDownButton);     // Button for decreasing opacity
+
+    this.showWeightPanel = jQuery('<img>', {
+        'title': 'Show weight panel',
+        'class': 'toolButton inactive',
+        'src': 'images/ellipse.svg',
+        'id': 'showWeightPanel',
+    });
+    tool.append(this.showWeightPanel);    // Button for showing the weight panel
 	
    
     /*
@@ -403,6 +411,18 @@ ToolBar.prototype.createButtons = function () {
     this.heatDownButton.on('click', function () {
 	this.annotools.heatmap_opacity = Math.max(0, this.annotools.heatmap_opacity - 0.1);
 	this.annotools.getMultiAnnot();
+    }.bind(this))
+
+    this.showWeightPanel.on('click', function () {
+	console.log('click on showing weight panel');
+	if (jQuery('#weightpanel').is(":visible"))
+	{
+		jQuery('#weightpanel').hide();
+	}
+	else
+	{
+		jQuery('#weightpanel').show('slide');
+	}
     }.bind(this))
 
 
