@@ -41,13 +41,28 @@ var annotools = function (options) {
   this.heatmap_opacity = 0.4;
   //this.heatmapColor = ['#bd0026','#fd8d3c','#fecc5c','#feedde'];
   this.heatmapColor = ['#feedde','#fecc5c','#fd8d3c','#bd0026'];
-  this.heat_weight1 = 0.5;
+  this.cb_checked = [false, false];
+  this.heat_weight = [0.5, 0.5];
   bar_var1 = document.getElementById('bar1');
+  bar_var2 = document.getElementById('bar2');
   slide_var1 = document.getElementById('slide1');
-  bar_click1 = false;
+  slide_var2 = document.getElementById('slide2');
+  cb1 = document.getElementById('cb1');
+  cb2 = document.getElementById('cb2');
+  bar_click = 0;	// 0: no bar is clicked, 1: bar_1 is clicked, 2: bar_2 is clicked
+
   bar_var1.addEventListener('mousedown', this.barMouseDown, false);
   bar_var1.addEventListener('mouseup', this.barMouseUp.bind(this), false);
   bar_var1.addEventListener('mousemove', this.barMouseSlide, false);
+  bar_var1.addEventListener('mouseleave', this.barMouseUp.bind(this), false);
+
+  bar_var2.addEventListener('mousedown', this.barMouseDown, false);
+  bar_var2.addEventListener('mouseup', this.barMouseUp.bind(this), false);
+  bar_var2.addEventListener('mousemove', this.barMouseSlide, false);
+  bar_var2.addEventListener('mouseleave', this.barMouseUp.bind(this), false);
+
+  cb1.addEventListener('change', this.checkboxChange.bind(this), false);
+  cb2.addEventListener('change', this.checkboxChange.bind(this), false);
 
   /*
    * OpenSeaDragon events
@@ -376,6 +391,9 @@ annotools.prototype.drawMarkups = function () // Draw Markups
         break
       case 'measure':
         this.drawMeasure(ctx)
+	break
+      case 'free_markup':
+	this.drawMarking(ctx)
         break
     }
   } else this.showMessage('Container Not SET Correctly Or Not Fully Loaded Yet')
@@ -1282,6 +1300,43 @@ annotools.prototype.convertFromNative = function (annot, end) {
     var lastPolyPoint = new OpenSeadragon.Point(parseFloat(last_poly_split[0]), parseFloat(last_poly_split[1]))
 
     points += this.imagingHelper.physicalToLogicalX(lastPolyPoint.x) + ',' + this.imagingHelper.physicalToLogicalY(lastPolyPoint.y)
+    var x_end = end.x
+    var y_end = end.y
+
+    var nativeX_end = this.imagingHelper.physicalToLogicalX(x_end)
+    var nativeY_end = this.imagingHelper.physicalToLogicalY(y_end)
+    var nativeX = this.imagingHelper.physicalToLogicalX(x)
+    var nativeY = this.imagingHelper.physicalToLogicalY(y)
+    var nativeW = nativeX_end - nativeX
+    var nativeH = nativeY_end - nativeY
+    var nativePoints = points
+
+    var globalNumber = JSON.encode({nativeW: nativeW, nativeH: nativeH, nativeX: nativeX, nativeY: nativeY,points: nativePoints})
+
+    return globalNumber
+  }
+  else if (annot.type == 'pencil_mark') {
+    var x = annot.x
+    var y = annot.y
+    var w = annot.w
+    var h = annot.h
+    var point = annot.points
+    var poly_first_split = String.split(point, ' ')
+    var points = ''
+    for (var k = 0; k < poly_first_split.length - 1; k++) {
+      var poly_second_split = String.split(poly_first_split[k], ',')
+
+      var polyPoint = new OpenSeadragon.Point(parseFloat(poly_second_split[0]), parseFloat(poly_second_split[1]))
+
+      points += this.imagingHelper.physicalToLogicalX(polyPoint.x) + ',' + this.imagingHelper.physicalToLogicalY(polyPoint.y) + ' '
+    }
+
+    var last_poly_split = String.split(poly_first_split[k], ',')
+
+    var lastPolyPoint = new OpenSeadragon.Point(parseFloat(last_poly_split[0]), parseFloat(last_poly_split[1]))
+
+    points += this.imagingHelper.physicalToLogicalX(lastPolyPoint.x) + ',' + this.imagingHelper.physicalToLogicalY(lastPolyPoint.y)
+	console.log(points);
     var x_end = end.x
     var y_end = end.y
 
@@ -2900,30 +2955,67 @@ annotools.prototype.promptForDownload = function(newAnnot, mode, annotools, ctx)
 annotools.prototype.barMouseDown = function(event)
 {
 	console.log('bar_mousedown');
+	console.log(bar_click);
+	console.log(event.target.id);
 	var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
 	//this.bar_var1.addEventListener('mousemove', this.barMouseSlide, false);
-	bar_click1 = true;
-	slide_var1.style.width = (set_perc * 100) + '%';
+	if (event.target.id == 'slide1' || event.target.id == 'bar1')
+	{
+		bar_click = 1;
+		//slide_var1.style.width = (set_perc * 100) + '%';
+		selected_slide = slide_var1;
+	}
+	else
+	{
+		bar_click = 2;
+		selected_slide = slide_var2;
+	}
+	selected_slide.style.width = (set_perc * 100) + '%';
 }
 
 annotools.prototype.barMouseUp = function(event)
 {
 	var self = this;
-        console.log('bar_mouseup');
-	bar_click1 = false;
-	//bar_var1.removeEventListener('mousemove', this.barMouseSlide, false);
+        //console.log('bar_mouseup');
+	if (bar_click == 0)
+	{
+		return;
+	}
 	var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
-	this.heat_weight1 = set_perc;
+	this.heat_weight[bar_click-1] = set_perc;
 	console.log(set_perc);
+	bar_click = 0;
+	this.cb_checked[0] = document.getElementById('cb1').checked;
+	this.cb_checked[1] = document.getElementById('cb2').checked;
 	self.getMultiAnnot();
 }
 
 annotools.prototype.barMouseSlide = function(event)
 {
-	if (bar_click1 == true)
+	if (bar_click != 0)
 	{
-        	console.log('bar_mouseslide');
+        	//console.log('bar_mouseslide');
 		var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
-		slide_var1.style.width = (set_perc * 100) + '%';
+		if (bar_click == 1)
+		{
+			slide_var1.style.width = (set_perc * 100) + '%';
+		}
+		else
+		{
+			slide_var2.style.width = (set_perc * 100) + '%';
+		}
 	}
 }
+
+annotools.prototype.checkboxChange = function(event)
+{
+	var self = this;
+	if (event.target.id == 'cb1')
+	{
+	}
+	else
+	{
+	}
+	self.getMultiAnnot();
+}
+

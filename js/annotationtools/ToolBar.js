@@ -135,6 +135,8 @@ ToolBar.prototype.setNormalMode = function() {
   jQuery("#drawRectangleButton").removeClass('active');
   jQuery("#drawFreelineButton").removeClass('active');
   jQuery("#drawDotButton").removeClass("active");   // Dot Tool
+  jQuery("#freeLineMarkupButton").removeClass("active");
+  jQuery("#markuppanel").hide('slide');
   this.annotools.drawLayer.hide()
   this.annotools.addMouseEvents()       
 }
@@ -309,6 +311,14 @@ ToolBar.prototype.createButtons = function () {
         'id': 'showWeightPanel',
     });
     tool.append(this.showWeightPanel);    // Button for showing the weight panel
+
+    this.freeMarkupButton = jQuery('<img>', {
+      'title': 'Free line Markup',
+      'class': 'toolButton inactive',
+      'src': 'images/pencil.svg',
+      'id': 'freeLineMarkupButton'
+    })
+    tool.append(this.freeMarkupButton) 	  // Markup Pencil Tool
 	
    
     /*
@@ -417,12 +427,34 @@ ToolBar.prototype.createButtons = function () {
 	console.log('click on showing weight panel');
 	if (jQuery('#weightpanel').is(":visible"))
 	{
-		jQuery('#weightpanel').hide();
+		jQuery('#weightpanel').hide('slide');
 	}
 	else
 	{
 		jQuery('#weightpanel').show('slide');
 	}
+    }.bind(this))
+
+
+    this.freeMarkupButton.on('click', function () {
+
+      if(this.annotools.mode == 'free_markup'){
+        this.setNormalMode();
+      } else {
+        //set pencil mode
+        this.annotools.mode = 'free_markup'
+        this.annotools.drawMarkups()
+
+        jQuery("canvas").css("cursor", "crosshair");
+        //jQuery("drawFreelineButton").css("opacity", 1);
+        jQuery("#drawRectangleButton").removeClass("active");
+        jQuery("#drawDotButton").removeClass("active");     // Dot Tool
+	jQuery("#drawFreelineButton").removeClass("active");
+        jQuery("#freeLineMarkupButton").addClass("active");
+	jQuery("#markuppanel").show('slide');
+
+      }
+
     }.bind(this))
 
 

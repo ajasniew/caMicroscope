@@ -52,6 +52,7 @@
         <script src="js/annotationtools/AnnotationStore.js"></script>
         <script src="js/annotationtools/osdAnnotationTools.js"></script>
 		<script src="js/annotationtools/osdAnnotationDotTools.js"></script>
+		<script src="js/annotationtools/osdAnnotationTools_Marking.js"></script>
         <script src="js/annotationtools/geoJSONHandler.js"></script>
         <script src="js/dependencies/MD5.js"></script>
         <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.min.js" type="text/javascript"></script> 
@@ -104,7 +105,9 @@
             <div id="tool"></div>
             <div id="panel"></div>
 	    <!-- <div id="weightpanel"><div id="slide"></div></div> -->
-	    <div id="weightpanel"><div id="bar1" class="bar"><div id="slide1" class="slide"></div></div></div>
+	    <div id="weightpanel"><div id="bar1" class="bar" align="right"><div id="slide1" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb1">  Lymphocite</label><div id="bar2" class="bar"><div id="slide2" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb2"> Necrosis</label><br><button type="button" class="btn_heatmap">Save</button></div>
+
+	    <div id="markuppanel"><input type="radio" name="marktype" value="LymPos" checked="checked" id="LymPos"> LymPos<br><input type="radio" name="marktype" value="LymNeg" id="LymNeg"> LymNeg<br><input type="radio" name="marktype" value="TumorPos" id="TumorPos"> TumorPos<br><input type="radio" name="marktype" value="TumorNeg" id="TumorNeg"> TumorNeg<br> <button type="button" class="btn_heatmap" id="btn_savemark">Save</button></div>
         <div id="algosel"><div id="tree"></div></div>
 
             <div class="demoarea">
@@ -207,6 +210,8 @@ function isAnnotationActive(){
         var zoom = <?php echo json_encode($_GET['zoom']); ?> || viewer.viewport.getMaxZoom();
 
         jQuery("#panel").hide();
+	jQuery("#weightpanel").hide();
+	jQuery("#markuppanel").hide();
         if(bound_x && bound_y){
             var ipt = new OpenSeadragon.Point(+bound_x, +bound_y);
             var vpt = viewer.viewport.imageToViewportCoordinates(ipt);

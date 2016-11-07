@@ -293,7 +293,8 @@ annotools.prototype.generateSVG = function (annotations) {
       var color = algorithm_color[algorithm_id]
 
       // var svg = 
-      svgHtml += '<polygon  class="annotationsvg" id="' + id + '" points="'
+      //svgHtml += '<polygon  class="annotationsvg" id="' + id + '" points="'
+      svgHtml += '<polyline  class="annotationsvg" id="' + id + '" points="'
 
       // svgHtml += '<polygon onclick="clickSVG(event)" class="annotationsvg" id="'+"poly"+i+'" points="'
       var polySVG = ''
@@ -322,7 +323,35 @@ annotools.prototype.generateSVG = function (annotations) {
 	case 'heatmap_multiple':
 		var lym_score = annotation.properties.multiheat_param.metric_array[0];
 		var nec_score = annotation.properties.multiheat_param.metric_array[1];
-		var nec_weight = annotation.properties.multiheat_param.weight_array[1];
+		var nec_weight = this.heat_weight[1];
+		var lym_weight = 1-this.heat_weight[0];
+
+		var lym_color_index = lym_score >= lym_weight ? 1 : 0;
+		var nec_color_index = nec_score >= nec_weight ? 1 : 0;
+		var lym_checked = document.getElementById('cb1').checked;
+		var nec_checked = document.getElementById('cb2').checked;
+
+		if (lym_checked == true && nec_checked == false)
+		{
+			console.log('1st case');
+			svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+		}
+
+		if (lym_checked == false && nec_checked == true)
+                {
+			svgHtml += '" style="fill:' + this.heatmapColor[nec_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+                }
+
+		if (lym_checked == true && nec_checked == true)
+                {
+			svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index*(1-nec_color_index)] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+                }
+
+		if (lym_checked == false && nec_checked == false)
+                {
+                        svgHtml += '" style="fill:' + this.heatmapColor[0] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+                }
+		/*
 		var combo = lym_score;
 		if (nec_score >= (1-this.heat_weight1))
 		{
@@ -331,7 +360,20 @@ annotools.prototype.generateSVG = function (annotations) {
 		var heatmapIndex = parseInt(parseInt((combo * 10))/2.5);
                 var heatcolor = this.heatmapColor[heatmapIndex];
                 svgHtml += '" style="fill:' + heatcolor.toString() + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+		*/
                 break;
+	
+	case 'marking':
+		var line_color = '';
+		switch (annotation.properties.annotations.mark_type)
+		{
+			case 'LymPos': line_color = 'red'; break;
+			case 'LymNeg': line_color = 'blue'; break;
+			case 'TumorPos': line_color = 'orange'; break;
+			case 'TumorNeg': line_color = 'lime'; break;
+		}
+		svgHtml += '" style="fill:transparent; stroke:'+line_color+ '; stroke-width:2.5"/>'
+		break;
 	default:
 		svgHtml += '" style="fill:transparent; stroke:'+color+ '; stroke-width:2.5"/>'
       }

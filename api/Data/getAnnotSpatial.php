@@ -62,7 +62,8 @@ switch ($_SERVER['REQUEST_METHOD'])
 
     $secrets = array(
       "human1" => "humantest", // secret => username
-      "prod1" => "humanProd"
+      "prod1" => "humanProd",
+      "mark1" => "humanmark"	// Added by Vu to make a human marking document on MongoDB
     );
 
     $authorized = false;
