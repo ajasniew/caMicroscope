@@ -3,16 +3,14 @@ annotools.prototype.drawMarking = function (ctx) {
   var started = false
   var pencil = []
   var newpoly = []
-  var anno_arr = [];
+  this.anno_arr = [];
+  this.marktype_arr = [];
 
   /*Change button and cursor*/
   jQuery("canvas").css("cursor", "crosshair");
   //jQuery("#drawFreelineButton").css("opacity", 1);
   /**/
 
-  jQuery('#btn_savemark').click();
-  btn_savemark_var = document.getElementById('btn_savemark');
-  btn_savemark_var.addEventListener('click', this.barMouseDown.bind(this), false);
 
   this.drawCanvas.addEvent('mousedown', function (e) {
     started = true
@@ -54,6 +52,7 @@ annotools.prototype.drawMarking = function (ctx) {
 
     //ctx.strokeStyle = this.color
     console.log(this.color);
+    ctx.lineWidth = 3.0;
     ctx.stroke()
   }.bind(this))
 
@@ -129,8 +128,9 @@ annotools.prototype.drawMarking = function (ctx) {
     geojsonAnnot.object_type = 'marking';
     //console.log(geojsonAnnot);
     //this.promptForAnnotation(geojsonAnnot, 'new', this, ctx)
-    anno_arr.push(geojsonAnnot);
-    this.saveMarking(geojsonAnnot, this.mark_type);
+    this.anno_arr.push(geojsonAnnot);
+    this.marktype_arr.push(this.mark_type);
+    //this.saveMarking(geojsonAnnot, this.mark_type);
 
     /* Change button back to inactive*/
     jQuery("canvas").css("cursor", "default");
@@ -151,4 +151,16 @@ annotools.prototype.saveMarking = function (newAnnot, mark_type) {
 }
 
 
+annotools.prototype.markSaveClick = function (event) {
+    console.log(this.anno_arr.length);
+    for (i = 0; i< this.anno_arr.length; i++)
+    {
+	this.saveMarking(this.anno_arr[i], this.marktype_arr[i]);
+    }
+    alert("Saved markup");
+    console.log('abcdef');
 
+    jQuery('#markuppanel').hide('slide');
+    this.drawLayer.hide();
+    this.addMouseEvents();
+}

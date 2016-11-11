@@ -38,9 +38,14 @@ var annotools = function (options) {
 
   this.annotationHandler = options.annotationHandler || new AnnotoolsOpenSeadragonHandler()
   // Added variables and event handler
-  this.heatmap_opacity = 0.4;
+  //this.heatmap_opacity = 0.4;
   //this.heatmapColor = ['#bd0026','#fd8d3c','#fecc5c','#feedde'];
+  this.btn_savemark_var = document.getElementById('btn_savemark');
+  this.btn_savemark_var.addEventListener('click', this.markSaveClick.bind(this), false);
+
+  this.heatmap_opacity = 0.4;
   this.heatmapColor = ['#feedde','#fecc5c','#fd8d3c','#bd0026'];
+  this.multipleHeatmapColor = [];
   this.cb_checked = [false, false];
   this.heat_weight = [0.5, 0.5];
   bar_var1 = document.getElementById('bar1');
@@ -119,6 +124,7 @@ var annotools = function (options) {
       'z-index': 1
     }
   }).inject(document.body) // drawLayer will hide by default
+  //this.drawLayer.bind('keydown', this.keyPress);
 
   // this.drawCanvas = jQuery('<canvas></canvas>')
   // this.drawCanvas.css({"position": "absolute", "z-index": 1})
@@ -168,6 +174,8 @@ annotools.prototype.getMultiAnnot = function (viewer) {
   }
 
   //console.log(algorithms);
+  //console.log(this.imagingHelper._viewportWidth);
+  //console.log(this.imagingHelper._viewportHeight);
   var self = this
   this.x1 = this.imagingHelper._viewportOrigin['x']
   this.y1 = this.imagingHelper._viewportOrigin['y']
@@ -277,6 +285,7 @@ annotools.prototype.getAnnotFilter = function (author, grade, multi) // Get Anno
 
 annotools.prototype.keyPress = function (code) // Key Down Events Handler
 {
+  console.log('enter keypress');
   switch (code) {
     case 84:
       // press t to toggle tools
@@ -323,6 +332,9 @@ annotools.prototype.keyPress = function (code) // Key Down Events Handler
       this.mode = 'magnify'
       this.magnify()
       break
+    case 81:
+      console.log('abc');
+      break;
   }
 }
 
@@ -1177,7 +1189,7 @@ annotools.prototype.saveAnnot = function (annotation) // Save Annotations
       if(res == "unauthorized"){
         alert("Error saving markup! Wrong secret");
       } else {   
-        alert("Successfully saved markup!");
+        //alert("Successfully saved markup!");
       }
       console.log(err)
       self.getMultiAnnot();

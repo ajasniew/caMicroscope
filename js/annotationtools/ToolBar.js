@@ -89,6 +89,7 @@ function goodalgo (data, status) {
 
       console.log('!SELECTED NODE : ' + node.title)
       targetType = data.targetType
+      console.log(node);
       annotool.getMultiAnnot()
     }
   })
@@ -222,6 +223,7 @@ ToolBar.prototype.createButtons = function () {
     })
     tool.append(this.spacer2)
 
+    /*
     this.filterbutton = jQuery('<img>', {
       'title': 'Filter Markups',
       'class': 'toolButton inactive',
@@ -235,7 +237,7 @@ ToolBar.prototype.createButtons = function () {
       'src': 'images/hide.svg'
     })
     tool.append(this.hidebutton)
-
+    */
 
     /*
     this.fullDownloadButton = jQuery('<img>', {
@@ -288,10 +290,30 @@ ToolBar.prototype.createButtons = function () {
     });
     tool.append(this.dotToolButton); // Dot Tool
 
+    this.spacer2 = jQuery('<img>', {
+      'class': 'spacerButton inactive',
+      'src': 'images/spacer.svg'
+    });
+    tool.append(this.spacer1);
+
+    this.filterbutton = jQuery('<img>', {
+      'title': 'Filter Markups',
+      'class': 'toolButton inactive',
+      'src': 'images/filter.svg'
+    })
+    tool.append(this.filterbutton) // Filter Button
+
+    this.hidebutton = jQuery('<img>', {
+      'title': 'Show/Hide Markups',
+      'class': 'toolButton inactive',
+      'src': 'images/hide.svg'
+    })
+    tool.append(this.hidebutton)
+
     this.heatUpButton = jQuery('<img>', {
 	'title': 'Increase opacity',
 	'class': 'toolButton inactive',
-	'src': 'images/ellipse.svg',
+	'src': 'images/Opacity_up.svg',
 	'id': 'heatUpButton',
     });
     tool.append(this.heatUpButton);	// Button for increasing opacity
@@ -299,7 +321,7 @@ ToolBar.prototype.createButtons = function () {
     this.heatDownButton = jQuery('<img>', {
         'title': 'Decrease opacity',
         'class': 'toolButton inactive',
-        'src': 'images/ellipse.svg',
+        'src': 'images/Opacity_down.svg',
         'id': 'heatDownButton',
     });
     tool.append(this.heatDownButton);     // Button for decreasing opacity
@@ -307,7 +329,7 @@ ToolBar.prototype.createButtons = function () {
     this.showWeightPanel = jQuery('<img>', {
         'title': 'Show weight panel',
         'class': 'toolButton inactive',
-        'src': 'images/ellipse.svg',
+        'src': 'images/Heatmap.svg',
         'id': 'showWeightPanel',
     });
     tool.append(this.showWeightPanel);    // Button for showing the weight panel

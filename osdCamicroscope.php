@@ -105,9 +105,9 @@
             <div id="tool"></div>
             <div id="panel"></div>
 	    <!-- <div id="weightpanel"><div id="slide"></div></div> -->
-	    <div id="weightpanel"><div id="bar1" class="bar" align="right"><div id="slide1" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb1">  Lymphocite</label><div id="bar2" class="bar"><div id="slide2" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb2"> Necrosis</label><br><button type="button" class="btn_heatmap">Save</button></div>
+	    <div id="weightpanel"><div id="bar1" class="bar" align="right"><div id="slide1" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb1" checked>  Lymphocite Sensitivity</label><div id="bar2" class="bar"><div id="slide2" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb2" checked> Necrosis Specificity</label><br><button type="button" class="btn_heatmap">Save</button></div>
 
-	    <div id="markuppanel"><input type="radio" name="marktype" value="LymPos" checked="checked" id="LymPos"> LymPos<br><input type="radio" name="marktype" value="LymNeg" id="LymNeg"> LymNeg<br><input type="radio" name="marktype" value="TumorPos" id="TumorPos"> TumorPos<br><input type="radio" name="marktype" value="TumorNeg" id="TumorNeg"> TumorNeg<br> <button type="button" class="btn_heatmap" id="btn_savemark">Save</button></div>
+	    <div id="markuppanel"><input type="radio" name="marktype" value="LymPos" checked="checked" id="LymPos" class="radio_markup"> <label class = radio_markup>LymPos</label><br><input type="radio" name="marktype" value="LymNeg" id="LymNeg" class="radio_markup"> <label class = radio_markup>LymNeg</label><br><input type="radio" name="marktype" value="TumorPos" id="TumorPos" class="radio_markup"> <label class = radio_markup>TumorPos</label><br><input type="radio" name="marktype" value="TumorNeg" id="TumorNeg" class="radio_markup"> <label class = radio_markup>TumorNeg</label><br> <input type="radio" name="marktype" value="Moving" id="Moving" class="radio_markup"> <label class = radio_markup>Moving</label><br> <button type="button" class="btn_heatmap" id="btn_savemark" class="radio_markup">Save</button></div>
         <div id="algosel"><div id="tree"></div></div>
 
             <div class="demoarea">

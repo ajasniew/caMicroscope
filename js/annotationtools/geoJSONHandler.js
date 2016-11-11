@@ -278,8 +278,28 @@ annotools.prototype.generateSVG = function (annotations) {
     svgHtml += '</g>'
     svgHtml += '<g id="viewport" transform="translate(0,0)">'
 
+    highres = false;
+    for (var i = 0; i < annotations.length; i++) {
+	if (annotations[i].footprint > 100000)
+	{
+		highres = true;
+		break;
+	}
+    }
+
+    if (this.imagingHelper._viewportWidth * this.imagingHelper._viewportHeight > 0.06)
+    {
+	highres = false;
+    }
+    console.log(highres);
     for (var i = 0; i < annotations.length; i++) {
       var annotation = annotations[i]
+	//console.log(annotation.footprint);
+      if (((highres == false) && (annotation.footprint <= 100000)) || ((highres == true) && (annotation.footprint > 100000)))
+      {
+	//console.log('in break');
+	continue;
+      }
 
       var id = '';
       
@@ -313,6 +333,7 @@ annotools.prototype.generateSVG = function (annotations) {
       //svgHtml += '" style="fill:transparent; stroke:'+color+ '; stroke-width:2.5"/>'
       //svgHtml += '" style="fill:' + '#feedde' + ';fill-opacity: 0.6;stroke-width:0"/>';
       //console.log(this.heatmap_opacity);
+      //console.log(this.imagingHelper._viewportWidth);
       switch (annotation.object_type)
       {
 	case 'heatmap':
@@ -333,7 +354,6 @@ annotools.prototype.generateSVG = function (annotations) {
 
 		if (lym_checked == true && nec_checked == false)
 		{
-			console.log('1st case');
 			svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
 		}
 

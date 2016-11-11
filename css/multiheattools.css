@@ -39,10 +39,10 @@
 }
 
 #markuppanel {
-    width: 220px;
+    width: 180px;
     font-family: Arial, Roboto;
     font-size: 12px;
-    height: 200px;
+    height: 170px;
     top: 60px;
     left: 0;
     position: fixed;
@@ -59,15 +59,21 @@
 .lb_heatmap {
 	position:relative;
 	top:5px;
-	left:110px;
+	left:60px;
 	text-align:right
 }
 
 .btn_heatmap {
 	position:relative;
         top:10px;
-        left:160px;
+        left:130px;
         text-align:right;
 	background-color: #008CBA;
 	border: none;
+}
+
+.radio_markup {
+	position:relative;
+	top:7px;
+        left:7px;
 }
