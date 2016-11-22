@@ -280,7 +280,7 @@ annotools.prototype.generateSVG = function (annotations) {
 
     highres = false;
     for (var i = 0; i < annotations.length; i++) {
-	if (annotations[i].footprint > 100000)
+	if (annotations[i].footprint < 100000)
 	{
 		highres = true;
 		break;
@@ -298,7 +298,10 @@ annotools.prototype.generateSVG = function (annotations) {
       if (((highres == false) && (annotation.footprint <= 100000)) || ((highres == true) && (annotation.footprint > 100000)))
       {
 	//console.log('in break');
-	continue;
+	if (annotation.object_type == 'heatmap_multiple')
+	{
+		continue;
+	}
       }
 
       var id = '';
@@ -337,7 +340,9 @@ annotools.prototype.generateSVG = function (annotations) {
       switch (annotation.object_type)
       {
 	case 'heatmap':
-		var heatmapIndex = parseInt(parseInt((annotation.properties.metric_value * 10))/2.5);
+		//console.log('case heatmap');
+		//var heatmapIndex = parseInt(parseInt((annotation.properties.metric_value * 10))/2.5);
+		var heatmapIndex = parseInt(parseInt(((1-annotation.properties.metric_value) * 10))/2.5);
 		var heatcolor = this.heatmapColor[heatmapIndex];
 		svgHtml += '" style="fill:' + heatcolor.toString() + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
 		break;
@@ -347,7 +352,7 @@ annotools.prototype.generateSVG = function (annotations) {
 		var nec_weight = this.heat_weight[1];
 		var lym_weight = 1-this.heat_weight[0];
 
-		var lym_color_index = lym_score >= lym_weight ? 1 : 0;
+		var lym_color_index = lym_score >= lym_weight ? 2 : 0;
 		var nec_color_index = nec_score >= nec_weight ? 1 : 0;
 		var lym_checked = document.getElementById('cb1').checked;
 		var nec_checked = document.getElementById('cb2').checked;
@@ -365,6 +370,7 @@ annotools.prototype.generateSVG = function (annotations) {
 		if (lym_checked == true && nec_checked == true)
                 {
 			svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index*(1-nec_color_index)] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+			//svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index+nec_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
                 }
 
 		if (lym_checked == false && nec_checked == false)

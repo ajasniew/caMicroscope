@@ -453,6 +453,11 @@ ToolBar.prototype.createButtons = function () {
 	}
 	else
 	{
+		if (this.annotools.loadedWeight == false) {
+			this.annotools.updateHeatVarFromSlideBar();
+			this.annotools.loadedWeight = true;
+		}
+		console.log(this.annotools.heat_weight);
 		jQuery('#weightpanel').show('slide');
 	}
     }.bind(this))
@@ -475,6 +480,12 @@ ToolBar.prototype.createButtons = function () {
         jQuery("#freeLineMarkupButton").addClass("active");
 	jQuery("#markuppanel").show('slide');
 
+	// Check if being on moving mode --> switch to drawing mode
+	if (document.getElementById("rb_Moving").checked) {
+		console.log('do switching');
+		document.getElementById('rb_Moving').checked = false;
+		document.getElementById('LymPos').checked = true;
+	}
       }
 
     }.bind(this))

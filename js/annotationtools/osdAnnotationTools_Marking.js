@@ -3,8 +3,11 @@ annotools.prototype.drawMarking = function (ctx) {
   var started = false
   var pencil = []
   var newpoly = []
+  this.newpoly_arr = [];
+  this.color_arr = [];
   this.anno_arr = [];
   this.marktype_arr = [];
+  this.current_canvasContext = ctx;
 
   /*Change button and cursor*/
   jQuery("canvas").css("cursor", "crosshair");
@@ -50,6 +53,7 @@ annotools.prototype.drawMarking = function (ctx) {
         this.mark_type = 'TumorNeg';
     }
 
+    this.color_arr.push(ctx.strokeStyle);
     //ctx.strokeStyle = this.color
     console.log(this.color);
     ctx.lineWidth = 3.0;
@@ -74,6 +78,7 @@ annotools.prototype.drawMarking = function (ctx) {
     started = false
     pencil = [];		// Added to process one poly at a time
     pencil.push(newpoly)
+    this.newpoly_arr.push(newpoly);
     newpoly = []
     numpoint = 0
     var x,y,w,h
@@ -152,15 +157,96 @@ annotools.prototype.saveMarking = function (newAnnot, mark_type) {
 
 
 annotools.prototype.markSaveClick = function (event) {
+	this.markSave(true, true);
+}
+
+annotools.prototype.markSave = function (notification, isSetNormalMode) {
     console.log(this.anno_arr.length);
     for (i = 0; i< this.anno_arr.length; i++)
     {
 	this.saveMarking(this.anno_arr[i], this.marktype_arr[i]);
     }
-    alert("Saved markup");
+    if (notification == true) {
+	alert("Saved markup");
+    }
     console.log('abcdef');
 
-    jQuery('#markuppanel').hide('slide');
-    this.drawLayer.hide();
-    this.addMouseEvents();
+    //jQuery('#markuppanel').hide('slide');
+    //this.drawLayer.hide();
+    //this.addMouseEvents();
+    if (isSetNormalMode == true)
+    {
+	jQuery('#markuppanel').hide('slide');
+	this.drawLayer.hide();
+	this.addMouseEvents();
+	this.toolBar.setNormalMode();
+    }
+}
+
+annotools.prototype.undoStroke = function () {
+    console.log('undo stroke');
+    console.log(this.newpoly_arr.length);
+    this.newpoly_arr.pop();
+    this.color_arr.pop();
+    this.anno_arr.pop();
+    console.log(this.newpoly_arr.length);
+    this.reDrawCanvas();
+}
+
+annotools.prototype.reDrawCanvas = function () {
+    ctx = this.current_canvasContext;
+    ctx.clearRect(0, 0, this.drawCanvas.width, this.drawCanvas.height);
+    for (i = 0; i< this.newpoly_arr.length; i++)
+    {
+	path = this.newpoly_arr[i];
+	ctx.beginPath();
+	ctx.moveTo(path[0].x, path[0].y);
+	ctx.strokeStyle = this.color_arr[i];
+	ctx.lineWidth = 3.0;
+	ctx.stroke();
+	for (iptx = 1; iptx < path.length; iptx++)
+	{
+	     ctx.lineTo(path[iptx].x, path[iptx].y)
+	     ctx.stroke()
+	}
+    }
+}
+
+annotools.prototype.radiobuttonChange = function(event) {
+	console.log('rb changed');
+	console.log(this.marking_choice);
+	var self = this;
+        if (event.target.id == 'rb_Moving')
+        {
+		console.log('rb_Moving mode');
+
+		// Save current
+		this.markSave(false, false);
+
+		// Switch to normal mode
+		jQuery("canvas").css("cursor", "default");
+  		jQuery("#drawRectangleButton").removeClass('active');
+  		jQuery("#drawFreelineButton").removeClass('active');
+  		jQuery("#drawDotButton").removeClass("active");   // Dot Tool
+  		jQuery("#freeLineMarkupButton").removeClass("active");
+  		//jQuery("#markuppanel").hide('slide');
+  		this.drawLayer.hide()
+  		this.addMouseEvents()
+        }
+        else
+        {
+		if (this.marking_choice == 'rb_Moving')
+		{
+			console.log('change to drawing mode');
+			this.drawMarkups();
+			jQuery("canvas").css("cursor", "crosshair");
+        		//jQuery("drawFreelineButton").css("opacity", 1);
+        		jQuery("#drawRectangleButton").removeClass("active");
+        		jQuery("#drawDotButton").removeClass("active");     // Dot Tool
+        		jQuery("#drawFreelineButton").removeClass("active");
+        		//jQuery("#freeLineMarkupButton").addClass("active");
+        		//jQuery("#markuppanel").show('slide');
+		}
+        }
+	this.marking_choice = event.target.id;
 }

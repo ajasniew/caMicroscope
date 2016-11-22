@@ -40,14 +40,35 @@ var annotools = function (options) {
   // Added variables and event handler
   //this.heatmap_opacity = 0.4;
   //this.heatmapColor = ['#bd0026','#fd8d3c','#fecc5c','#feedde'];
+  this.marking_choice = 'LymPos';
+  //this.isLoadedWeight = false;
+  //this.loadHeatmapWeight();
+  this.btn_saveWeight = document.getElementById('btn_saveHeatmapWeight');
+  this.rb_lympos = document.getElementById('LymPos');
+  this.rb_lymneg = document.getElementById('LymNeg');
+  this.rb_tumpos = document.getElementById('TumorPos');
+  this.rb_tumneg = document.getElementById('TumorNeg');
+  this.rb_move = document.getElementById('rb_Moving');
+  this.rb_lympos.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_lymneg.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_tumpos.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_tumneg.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_move.addEventListener('click', this.radiobuttonChange.bind(this), false);
+
+  this.btn_saveWeight.addEventListener('click', this.saveHeatmapWeight.bind(this), false);
+
   this.btn_savemark_var = document.getElementById('btn_savemark');
   this.btn_savemark_var.addEventListener('click', this.markSaveClick.bind(this), false);
+  this.btn_undomark_var = document.getElementById('btn_undomark');
+  this.btn_undomark_var.addEventListener('click', this.undoStroke.bind(this), false);
 
   this.heatmap_opacity = 0.4;
   this.heatmapColor = ['#feedde','#fecc5c','#fd8d3c','#bd0026'];
   this.multipleHeatmapColor = [];
   this.cb_checked = [false, false];
   this.heat_weight = [0.5, 0.5];
+  this.loadedWeight = false;
+  this.loadHeatmapWeight();
   bar_var1 = document.getElementById('bar1');
   bar_var2 = document.getElementById('bar2');
   slide_var1 = document.getElementById('slide1');
@@ -3029,5 +3050,63 @@ annotools.prototype.checkboxChange = function(event)
 	{
 	}
 	self.getMultiAnnot();
+}
+
+annotools.prototype.saveHeatmapWeight = function(event)
+{
+	var self = this;
+	console.log('enter save heatmap');
+	$.ajax({
+           type: "POST",
+           url: "php/save_weight.php",
+           data: {iid: self.iid, lymweight: this.heat_weight[0], necweight: this.heat_weight[1]},
+           dataType: "text",
+           success: function(data) {
+               console.log(data);
+	       alert('Saved heatmap weights');
+	   }
+	});
+}
+
+annotools.prototype.loadHeatmapWeight = function()
+{
+	var self = this;
+        console.log('Load heatmap weights');
+	console.log(self.iid);
+        $.ajax({
+           type: "POST",
+           url: "php/load_weight.php",
+           data: {iid: self.iid},
+           dataType: "text",
+           success: function(data) {
+	     var sl1 = document.getElementById('slide1');
+	     var sl2 = document.getElementById('slide2');
+		console.log(data);
+	     if (!data.startsWith('NaN')) { 
+	       parts = data.split('\n');
+	       //arr = [parseFloat(parts[0]), parseFloat(parts[1])];
+	       //var sl1 = document.getElementById('slide1');
+	       //var sl2 = document.getElementById('slide2');
+	       var lym = (parseFloat(parts[0]) * 100).toString() + '%';
+	       var nec = (parseFloat(parts[1]) * 100).toString() + '%';
+	       sl1.style.width = lym;
+	       sl2.style.width = nec;
+	     } else
+	     {
+		console.log('go else');
+		sl1.style.width = '50%';
+		sl2.style.width = '50%';
+	     }
+           }
+        });
+}
+
+annotools.prototype.updateHeatVarFromSlideBar = function()
+{
+	var sl1 = document.getElementById('slide1');
+	var sl2 = document.getElementById('slide2');
+	var lym = parseFloat(sl1.style.width.substring(0, sl1.style.width.length)) / 100;
+	var nec = parseFloat(sl2.style.width.substring(0, sl2.style.width.length)) / 100;
+	this.heat_weight = [lym, nec];
 }
 
