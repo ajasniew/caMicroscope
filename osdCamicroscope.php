@@ -185,12 +185,15 @@ function isAnnotationActive(){
 
     function addOverlays() {
         var annotationHandler = new AnnotoolsOpenSeadragonHandler(viewer, {});
+	var sessionUsername = <?php echo '"' . $_SESSION['email'] . '"' ?>;
+	//var sessionUsername = 'test@gmail.com';
         annotool= new annotools({
                 canvas:'openseadragon-canvas',
                 iid: tissueId, 
                 viewer: viewer,
                 annotationHandler: annotationHandler,
-                mpp:MPP
+                mpp:MPP,
+		username: sessionUsername
             });
         //console.log(tissueId);
         var toolBar = new ToolBar('tool', {

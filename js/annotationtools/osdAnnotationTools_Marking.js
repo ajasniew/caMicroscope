@@ -8,6 +8,7 @@ annotools.prototype.drawMarking = function (ctx) {
   this.anno_arr = [];
   this.marktype_arr = [];
   this.current_canvasContext = ctx;
+  this.mark_type = 'LymPos';
 
   /*Change button and cursor*/
   jQuery("canvas").css("cursor", "crosshair");
@@ -52,6 +53,7 @@ annotools.prototype.drawMarking = function (ctx) {
         ctx.strokeStyle = 'lime';
         this.mark_type = 'TumorNeg';
     }
+	console.log(this.mark_type);
 
     this.color_arr.push(ctx.strokeStyle);
     //ctx.strokeStyle = this.color
@@ -148,7 +150,8 @@ annotools.prototype.drawMarking = function (ctx) {
 annotools.prototype.saveMarking = function (newAnnot, mark_type) {
     var val = {
 	'secret': 'mark1',
-	'mark_type': mark_type
+	'mark_type': mark_type,
+	'username': this.username
     }
     newAnnot.properties.annotations = val;
     console.log(newAnnot.properties.annotations.secret);
@@ -169,7 +172,7 @@ annotools.prototype.markSave = function (notification, isSetNormalMode) {
     if (notification == true) {
 	alert("Saved markup");
     }
-    console.log('abcdef');
+    console.log(this.marktype_arr);
 
     //jQuery('#markuppanel').hide('slide');
     //this.drawLayer.hide();
@@ -189,7 +192,8 @@ annotools.prototype.undoStroke = function () {
     this.newpoly_arr.pop();
     this.color_arr.pop();
     this.anno_arr.pop();
-    console.log(this.newpoly_arr.length);
+    this.marktype_arr.pop();
+    console.log(this.color_arr);
     this.reDrawCanvas();
 }
 
@@ -250,3 +254,59 @@ annotools.prototype.radiobuttonChange = function(event) {
         }
 	this.marking_choice = event.target.id;
 }
+
+
+annotools.prototype.calculateIntersect = function() {
+    var marking_sample_rate = 2;
+    var annotations = this.annotations;
+
+    var labels = [];
+    var id = [];
+    var cx = [];
+    var cy = [];
+
+    if (annotations == null) {
+	return labels;
+    }
+
+    // get heatmap patch centers
+    for (var i = 0; i < annotations.length; i++) {
+        var annotation = annotations[i];
+        labels.push(0);
+        if (annotation.object_type == 'heatmap_multiple') {
+            var nativepoints = annotation.geometry.coordinates[0];
+            id.push(i);
+            cx.push((nativepoints[0][0] + nativepoints[2][0])/2.0);
+            cy.push((nativepoints[0][1] + nativepoints[2][1])/2.0);
+            half_patch_size = (Math.abs(nativepoints[0][0] - nativepoints[1][0]) + Math.abs(nativepoints[0][1] - nativepoints[1][1])) / 2.0;
+        }
+    }
+
+    // traverse markings
+    for (var i = 0; i < annotations.length; i++) {
+        var annotation = annotations[i];
+        if (annotation.object_type == 'marking') {
+            if (annotation.properties.annotations.mark_type == 'LymPos') {
+                label = 1;
+            } else if (annotation.properties.annotations.mark_type == 'LymNeg') {
+                label = -1;
+            } else {
+                continue;
+            }
+            var nativepoints = annotation.geometry.coordinates[0];
+            for (var k = 0; k < nativepoints.length; k+=marking_sample_rate) {
+                x = nativepoints[k][0];
+                y = nativepoints[k][1];
+                for (var xy_i = 0; xy_i < cx.length; xy_i++) {
+                    if ((Math.abs(cx[xy_i] - x) <= half_patch_size) && (Math.abs(cy[xy_i] - y) <= half_patch_size)) {
+                        labels[id[xy_i]] = label;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return labels;
+}
+

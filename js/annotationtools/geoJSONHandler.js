@@ -186,6 +186,7 @@ function endProfile (startTime) {
 annotools.prototype.generateCanvas = function (annotations) {
   // console.log(annotation)
   // var annotation = annotations[ii]
+  var intersect_label = this.calculateIntersect();
   var annotations = this.annotations
   if (annotations) {
     var markup_svg = document.getElementById('markups')
@@ -253,6 +254,7 @@ var clickSVG = function(evt, annotation){
 annotools.prototype.generateSVG = function (annotations) {
   // console.log(annotation)
   // var annotation = annotations[ii]
+  var intersect_label = this.calculateIntersect();
   var self =this;
   var annotations = this.annotations
   if (annotations) {
@@ -357,26 +359,37 @@ annotools.prototype.generateSVG = function (annotations) {
 		var lym_checked = document.getElementById('cb1').checked;
 		var nec_checked = document.getElementById('cb2').checked;
 
-		if (lym_checked == true && nec_checked == false)
+		if (intersect_label[i] != 0)
 		{
-			svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+			switch (intersect_label[i])
+			{
+			case -1: svgHtml += '" style="fill:' + this.heatmapColor[4] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>'; break;
+			case 1: svgHtml += '" style="fill:' + this.heatmapColor[3] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>'; break;
+			}
 		}
+		else
+		{
+			if (lym_checked == true && nec_checked == false)
+			{
+				svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+			}
 
-		if (lym_checked == false && nec_checked == true)
-                {
-			svgHtml += '" style="fill:' + this.heatmapColor[nec_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
-                }
+			if (lym_checked == false && nec_checked == true)
+			{
+				svgHtml += '" style="fill:' + this.heatmapColor[nec_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+			}
 
-		if (lym_checked == true && nec_checked == true)
-                {
-			svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index*(1-nec_color_index)] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
-			//svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index+nec_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
-                }
+			if (lym_checked == true && nec_checked == true)
+			{
+				svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index*(1-nec_color_index)] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+				//svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index+nec_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+			}
 
-		if (lym_checked == false && nec_checked == false)
-                {
-                        svgHtml += '" style="fill:' + this.heatmapColor[0] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
-                }
+			if (lym_checked == false && nec_checked == false)
+			{
+				svgHtml += '" style="fill:' + this.heatmapColor[0] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+			}
+		}
 		/*
 		var combo = lym_score;
 		if (nec_score >= (1-this.heat_weight1))

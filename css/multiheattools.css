@@ -72,6 +72,15 @@
 	border: none;
 }
 
+.btn_mark {
+        position:relative;
+        top:10px;
+	left:130;
+	text-align:right;
+        background-color: #008CBA;
+        border: none;
+}
+
 .radio_markup {
 	position:relative;
 	top:7px;

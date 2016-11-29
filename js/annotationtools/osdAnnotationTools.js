@@ -26,6 +26,9 @@ var annotools = function (options) {
   this.annotVisible = true // The Annotations are Set to be visible at the First Loading
   this.mode = 'default' // The Mode is Set to Default
 
+  this.username = options.username;	// Username from session variable
+  console.log(this.username);
+
   this.viewer = options.viewer
   this.imagingHelper = this.viewer.imagingHelper
   this.mpp = options.mpp
@@ -63,7 +66,7 @@ var annotools = function (options) {
   this.btn_undomark_var.addEventListener('click', this.undoStroke.bind(this), false);
 
   this.heatmap_opacity = 0.4;
-  this.heatmapColor = ['#feedde','#fecc5c','#fd8d3c','#bd0026'];
+  this.heatmapColor = ['#feedde','#fecc5c','#fd8d3c','#bd0026', '#33b5ff'];
   this.multipleHeatmapColor = [];
   this.cb_checked = [false, false];
   this.heat_weight = [0.5, 0.5];
