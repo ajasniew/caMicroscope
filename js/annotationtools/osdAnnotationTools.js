@@ -835,7 +835,7 @@ annotools.prototype.addnewAnnot = function (newAnnot) // Add New Annotations
   // console.log(newAnnot)
   // this.annotations.push(newAnnot)
   // console.log(this.annotations)
-  console.log(newAnnot)
+  //console.log(newAnnot)
   this.saveAnnot(newAnnot)
   // console.log("saved annotation")
 
@@ -1372,7 +1372,6 @@ annotools.prototype.convertFromNative = function (annot, end) {
     var lastPolyPoint = new OpenSeadragon.Point(parseFloat(last_poly_split[0]), parseFloat(last_poly_split[1]))
 
     points += this.imagingHelper.physicalToLogicalX(lastPolyPoint.x) + ',' + this.imagingHelper.physicalToLogicalY(lastPolyPoint.y)
-	console.log(points);
     var x_end = end.x
     var y_end = end.y
 
@@ -3062,7 +3061,7 @@ annotools.prototype.saveHeatmapWeight = function(event)
 	$.ajax({
            type: "POST",
            url: "php/save_weight.php",
-           data: {iid: self.iid, lymweight: this.heat_weight[0], necweight: this.heat_weight[1]},
+           data: {iid: self.iid, lymweight: this.heat_weight[0], necweight: this.heat_weight[1], user: this.username},
            dataType: "text",
            success: function(data) {
                console.log(data);
@@ -3079,7 +3078,7 @@ annotools.prototype.loadHeatmapWeight = function()
         $.ajax({
            type: "POST",
            url: "php/load_weight.php",
-           data: {iid: self.iid},
+           data: {iid: self.iid, user: this.username},
            dataType: "text",
            success: function(data) {
 	     var sl1 = document.getElementById('slide1');

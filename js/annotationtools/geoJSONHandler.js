@@ -102,7 +102,6 @@ annotools.prototype.convertPencilToGeo = function (annotation) {
 
 
   var area = Math.abs((dataX2 - dataX1))*Math.abs((dataY2-dataY1));
-  console.log(area)
 
   
 
@@ -186,7 +185,7 @@ function endProfile (startTime) {
 annotools.prototype.generateCanvas = function (annotations) {
   // console.log(annotation)
   // var annotation = annotations[ii]
-  var intersect_label = this.calculateIntersect();
+  //var intersect_label = this.calculateIntersect();
   var annotations = this.annotations
   if (annotations) {
     var markup_svg = document.getElementById('markups')
@@ -304,6 +303,11 @@ annotools.prototype.generateSVG = function (annotations) {
 	{
 		continue;
 	}
+      }
+
+      if (annotation.object_type == 'marking' && (annotation.properties.annotations.mark_type == 'LymPos' || annotation.properties.annotations.mark_type == 'LymNeg'))
+      {
+		//continue;
       }
 
       var id = '';

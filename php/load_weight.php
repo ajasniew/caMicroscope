@@ -1,9 +1,10 @@
 <?php
 
 $iid = $_POST["iid"];
+$user = $_POST["user"];
 
-$fname = "../data/" . $iid . ".txt";
-
+//$fname = "../data/" . $iid . ".txt";
+$fname = "../data/" . $iid . "_" . $user . ".txt";
 $content = "NaN";
 if (file_exists($fname))
 {
