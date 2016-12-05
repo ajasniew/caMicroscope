@@ -32,6 +32,7 @@ if (!empty($_SESSION['api_key'])) {
             
 
             $url = $getUrl . "&CaseId=" . $iid ."&x1=" . $x . "&y1=" . $y . "&x2=" . $x1 . "&y2=" . $y1 . "&footprint=" . $area . "&algorithms=" . $algorithms;
+
             //echo $url;
 			$getRequest = new RestRequest($url,'GET');
             $getRequest->execute();

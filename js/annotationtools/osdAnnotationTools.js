@@ -3065,7 +3065,15 @@ annotools.prototype.saveHeatmapWeight = function(event)
            dataType: "text",
            success: function(data) {
                console.log(data);
-	       alert('Saved heatmap weights');
+	       if (data.startsWith('Locked'))
+	       {
+		    console.log('being locked');
+		    alert ('This heatmap has been locked');
+	       }
+	       else
+	       {
+		    alert('Saved heatmap weights');
+	       }
 	   }
 	});
 }

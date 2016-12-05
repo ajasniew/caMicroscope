@@ -307,7 +307,7 @@ annotools.prototype.generateSVG = function (annotations) {
 
       if (annotation.object_type == 'marking' && (annotation.properties.annotations.mark_type == 'LymPos' || annotation.properties.annotations.mark_type == 'LymNeg'))
       {
-		//continue;
+		continue;
       }
 
       var id = '';

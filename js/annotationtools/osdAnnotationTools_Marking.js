@@ -10,6 +10,9 @@ annotools.prototype.drawMarking = function (ctx) {
   this.current_canvasContext = ctx;
   this.mark_type = 'LymPos';
 
+  // Variables for broken markups
+  this.rawAnnotArray = [];
+
   /*Change button and cursor*/
   jQuery("canvas").css("cursor", "crosshair");
   //jQuery("#drawFreelineButton").css("opacity", 1);
@@ -131,6 +134,7 @@ annotools.prototype.drawMarking = function (ctx) {
     loc[1] = parseFloat(newAnnot.y)
     newAnnot.loc = loc
     //console.log(newAnnot)
+    this.rawAnnotArray.push(newAnnot);
     var geojsonAnnot = this.convertPencilToGeo(newAnnot)
     geojsonAnnot.object_type = 'marking';
     //console.log(geojsonAnnot);
@@ -147,6 +151,47 @@ annotools.prototype.drawMarking = function (ctx) {
   }.bind(this))
 }
 
+annotools.prototype.breakAndConvertToGeo = function ()
+{
+	// Refresh this.anno_arr
+	this.anno_arr = [];
+	this.marktype_broken_arr = [];
+	for (i = 0; i< this.rawAnnotArray.length; i++)
+	{
+		rawAnnot = this.rawAnnotArray[i];
+
+		// Convert rawAnnot
+		var floatPoints = [];
+		var point_str_set = rawAnnot.points.split(' ');
+		for (iPoint = 0; iPoint < point_str_set.length; iPoint++)
+		{
+			point_str = point_str_set[iPoint].split(',');
+			floatPoints.push([parseFloat(point_str[0]), parseFloat(point_str[1])]);
+		}
+
+		brokenAnnot = JSON.parse(this.break_drawings(floatPoints));
+		coor_set = brokenAnnot.coordinate_set;
+		for (j = 0; j < coor_set.length; j++)
+		{
+			var newAnnot = {
+      				x: brokenAnnot.nativeX_set[j],
+      				y: brokenAnnot.nativeY_set[j],
+      				w: brokenAnnot.nativeW_set[j],
+      				h: brokenAnnot.nativeH_set[j],
+      				type: 'pencil_mark',
+      				points: coor_set[j],
+      				color: this.color_arr[i],
+      				loc: [parseFloat(brokenAnnot.nativeX_set[j]), parseFloat(brokenAnnot.nativeY_set[j])]
+    			};
+			console.log(newAnnot);
+			var geojsonAnnot = this.convertPencilToGeo(newAnnot);
+			geojsonAnnot.object_type = 'marking';
+			this.anno_arr.push(geojsonAnnot);
+			this.marktype_broken_arr.push(this.marktype_arr[i]);
+		}
+	}
+}
+
 annotools.prototype.saveMarking = function (newAnnot, mark_type) {
     var val = {
 	'secret': 'mark1',
@@ -159,16 +204,13 @@ annotools.prototype.saveMarking = function (newAnnot, mark_type) {
     this.addnewAnnot(newAnnot);
 }
 
-
-annotools.prototype.markSaveClick = function (event) {
-	this.markSave(false, false);
-}
-
 annotools.prototype.markSave = function (notification, isSetNormalMode) {
     console.log(this.anno_arr.length);
+    //this.breakAndConvertToGeo();
     for (i = 0; i< this.anno_arr.length; i++)
     {
 	this.saveMarking(this.anno_arr[i], this.marktype_arr[i]);
+	//this.saveMarking(this.anno_arr[i], this.marktype_broken_arr[i]);
     }
     if (notification == true) {
 	alert("Saved markup");
@@ -192,6 +234,10 @@ annotools.prototype.markSave = function (notification, isSetNormalMode) {
 	//this.toolBar.setNormalMode();
 	
     }
+}
+
+annotools.prototype.markSaveClick = function (event) {
+        this.markSave(false, false);
 }
 
 annotools.prototype.undoStroke = function () {
@@ -273,6 +319,10 @@ annotools.prototype.break_drawings = function(nativepoints) {
     nativeW_set = [];
     nativeH_set = [];
 
+    var canvas_offset_raw = OpenSeadragon.getElementOffset(viewer.canvas);
+    var canvas_offset_x = this.imagingHelper.physicalToLogicalX(canvas_offset_raw.x);		// Added by Vu
+    var canvas_offset_y = this.imagingHelper.physicalToLogicalY(canvas_offset_raw.y);
+
     if (nativepoints.length == 0)
         return [coordinate_set, nativeX_set, nativeY_set, nativeW_set, nativeH_set];
 
@@ -283,27 +333,46 @@ annotools.prototype.break_drawings = function(nativepoints) {
         y = nativepoints[k][1];
 
         len = Math.sqrt((x-x_old)*(x-x_old) + (y-y_old)*(y-y_old));
-        divn = len / patch_size;
+        divn = Math.floor(len / patch_size);
         if ((divn < 1) && (k != nativepoints.length - 1)) {
             continue;
         }
         dir_x = (x-x_old) / len;
         dir_y = (y-y_old) / len;
         coor = [];
+	coor_str = '';
         for (ps = 0; ps <= divn; ps++) {
-            coor.push([x_old + dir_x * ps, y_old + dir_y * ps]);
+	    added_X = x_old + dir_x * ps;
+	    added_Y = y_old + dir_y * ps;
+            coor.push([added_X, added_Y]);
+
+	    coor_str += added_X + ',' + added_Y + ' ';
+	    
         }
         coor.push([x, y]);
-        coordinate_set.push(coor);
+	coor_str += x + ',' + y;
+        coordinate_set.push(coor_str);
+
+	//raw_end_point = new OpenSeadragon.Point(coor[divn+1][0], coor[divn+1][1]);
+	//end_point = endMousePosition.minus(OpenSeadragon.getElementOffset(viewer.canvas));
+	end_point_X = coor[divn+1][0];// - canvas_offset_x;
+	end_point_Y = coor[divn+1][1];// - canvas_offset_y;
         nativeX_set.push(coor[0][0]);
         nativeY_set.push(coor[0][1]);
-        nativeW_set.push(coor[divn+2][0]-coor[0][0]);
-        nativeH_set.push(coor[divn+2][1]-coor[0][1]);
+        //nativeW_set.push(coor[divn+1][0]-coor[0][0]);		// change from "divn+2" to "divn+1"
+        //nativeH_set.push(coor[divn+1][1]-coor[0][1]);		// change from "divn+2" to "divn+1"
+        console.log(coor[divn+1][0]);
+        console.log(canvas_offset_x);
+        console.log(end_point_X);
+	console.log(coor[0][0]);
+        nativeW_set.push(end_point_X-coor[0][0]);
+	nativeH_set.push(end_point_Y-coor[0][1]);
 
         x_old = x;
         y_old = y;
     }
-    return [coordinate_set, nativeX_set, nativeY_set, nativeW_set, nativeH_set];
+    return result = JSON.encode({coordinate_set:coordinate_set, nativeX_set:nativeX_set, nativeY_set:nativeY_set, nativeW_set:nativeW_set, nativeH_set:nativeH_set});
+    //return [coordinate_set, nativeX_set, nativeY_set, nativeW_set, nativeH_set];
 }
 
 
@@ -323,6 +392,7 @@ annotools.prototype.calculateIntersect = function() {
     }
 
     // get heatmap patch centers
+    half_patch_size = 0;
     for (var i = 0; i < annotations.length; i++) {
         var annotation = annotations[i];
         labels.push(0);
@@ -336,6 +406,9 @@ annotools.prototype.calculateIntersect = function() {
         }
     }
 
+    if (half_patch_size == 0) {
+	return;
+    }
 
     var dis = center_dis * half_patch_size;
 
