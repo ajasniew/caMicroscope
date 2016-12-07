@@ -187,43 +187,7 @@ ToolBar.prototype.createButtons = function () {
      * Ganesh
      * Mootools to Jquery for creation of toolbar buttons
      */
-    this.rectbutton = jQuery('<img>', {
-      title: 'Draw Rectangle',
-      class: 'toolButton firstToolButtonSpace inactive',
-      src: 'images/rect.svg',
-      id: 'drawRectangleButton'
-    })
-    tool.append(this.rectbutton)
 
-    this.ellipsebutton = jQuery('<img>', {
-      'title': 'Draw Ellipse',
-      'class': 'toolButton inactive',
-      'src': 'images/ellipse.svg'
-    })
-    tool.append(this.ellipsebutton)
-
-    this.pencilbutton = jQuery('<img>', {
-      'title': 'Draw Freeline',
-      'class': 'toolButton inactive',
-      'src': 'images/pencil.svg',
-      'id': 'drawFreelineButton'
-    })
-    tool.append(this.pencilbutton) // Pencil Tool
-
-    this.measurebutton = jQuery('<img>', {
-      'title': 'Measurement Tool',
-      'class': 'toolButton inactive',
-      'src': 'images/measure.svg'
-    })
-    // tool.append(this.measurebutton)
-
-    this.spacer2 = jQuery('<img>', {
-      'class': 'spacerButton inactive',
-      'src': 'images/spacer.svg'
-    })
-    tool.append(this.spacer2)
-
-    /*
     this.filterbutton = jQuery('<img>', {
       'title': 'Filter Markups',
       'class': 'toolButton inactive',
@@ -237,78 +201,14 @@ ToolBar.prototype.createButtons = function () {
       'src': 'images/hide.svg'
     })
     tool.append(this.hidebutton)
-    */
 
-    /*
-    this.fullDownloadButton = jQuery('<img>', {
-      'title': 'Download All Markups (Coming Soon)',
-      'class': 'toolButton inactive',
-      'src': 'images/fullDownload.svg'
-    })
-    tool.append(this.fullDownloadButton)
-    */
-    this.spacer1 = jQuery('<img>', {
-      'class': 'spacerButton inactive',
-      'src': 'images/spacer.svg'
-    })
-    tool.append(this.spacer1)
-
-    /*
-    this.analyticsbutton = jQuery('<img>', {
-      'title': 'Analytics Serviecs',
-      'class': 'toolButton',
-      'src': 'images/analyze.png'
-
-    })
-    tool.append(this.analyticsbutton)
-
-    this.filterImgButton = jQuery('<img>', {
-      'title': 'Image Filtering',
-      'class': 'toolButton',
-      'src': 'images/insta.png'
-    })
-    tool.append(this.filterImgButton)
-    */
-    this.partialDownloadButton = jQuery('<img>', {
-      'title': 'Download Partial Markups (Coming Soon)',
-      'class': 'toolButton inactive',
-      'src': 'images/partDownload.svg'
-    })
-     tool.append(this.partialDownloadButton)  //Partial Download
-     
-    this.spacer1 = jQuery('<img>', {
-      'class': 'spacerButton inactive',
-      'src': 'images/spacer.svg'
-    });
-    tool.append(this.spacer1);
-    
-    this.dotToolButton = jQuery('<img>', {
-        'title': 'Dot Tool',
+    this.heatDownButton = jQuery('<img>', {
+        'title': 'Decrease opacity',
         'class': 'toolButton inactive',
-        'src': 'images/analyze.png',
-        'id': 'drawDotButton'
+        'src': 'images/Opacity_down.svg',
+        'id': 'heatDownButton',
     });
-    tool.append(this.dotToolButton); // Dot Tool
-
-    this.spacer2 = jQuery('<img>', {
-      'class': 'spacerButton inactive',
-      'src': 'images/spacer.svg'
-    });
-    tool.append(this.spacer1);
-
-    this.filterbutton = jQuery('<img>', {
-      'title': 'Filter Markups',
-      'class': 'toolButton inactive',
-      'src': 'images/filter.svg'
-    })
-    tool.append(this.filterbutton) // Filter Button
-
-    this.hidebutton = jQuery('<img>', {
-      'title': 'Show/Hide Markups',
-      'class': 'toolButton inactive',
-      'src': 'images/hide.svg'
-    })
-    tool.append(this.hidebutton)
+    tool.append(this.heatDownButton);     // Button for decreasing opacity
 
     this.heatUpButton = jQuery('<img>', {
 	'title': 'Increase opacity',
@@ -318,13 +218,18 @@ ToolBar.prototype.createButtons = function () {
     });
     tool.append(this.heatUpButton);	// Button for increasing opacity
 
-    this.heatDownButton = jQuery('<img>', {
-        'title': 'Decrease opacity',
-        'class': 'toolButton inactive',
-        'src': 'images/Opacity_down.svg',
-        'id': 'heatDownButton',
-    });
-    tool.append(this.heatDownButton);     // Button for decreasing opacity
+    this.colorMapButton = jQuery('<img>', {
+      'class': 'colorMapButton',
+      'title': 'ColorMap',
+      'src': 'images/colors.svg'
+    })
+    tool.append(this.colorMapButton)
+
+    //this.spacer = jQuery('<img>', {
+    //  'class': 'spacerButton inactive',
+    //  'src': 'images/divider.svg'
+    //})
+    //tool.append(this.spacer)
 
     this.showWeightPanel = jQuery('<img>', {
         'title': 'Show weight panel',
@@ -346,76 +251,6 @@ ToolBar.prototype.createButtons = function () {
     /*
      * Event handlers on click for the buttons
      */
-    this.rectbutton.on('click', function () {
-      //console.log(this.mode);
-      if(this.annotools.mode == 'rect'){
-        this.setNormalMode();
-        //this.
-      } else {
-        this.mode = 'rect'
-        this.annotools.mode = 'rect'
-        this.annotools.drawMarkups();
-        jQuery("canvas").css("cursor", "crosshair");
-        jQuery("#drawRectangleButton").addClass("active"); 
-        //console.log(jQuery("#drawRectangleButton")); 
-        jQuery("#drawFreelineButton").removeClass("active");
-        jQuery("#drawDotButton").removeClass("active");   // Dot Tool
-
-        //console.log("added class");     
-      }
-    // alert("Creation of markups is disabled on QuIP")
-    }.bind(this))
-    this.partialDownloadButton.on('click', function(){
-      this.annotools.downloadROI();
-    }.bind(this));
-      
-    // Dot Tool start
-    this.dotToolButton.on('click', function(){
-        if (this.annotools.mode == 'dot') {
-            this.setNormalMode();
-        }else{
-            this.mode = 'dot';
-            this.annotools.mode = 'dot';
-            this.annotools.drawDots();
-            jQuery("svg").css("cursor", "crosshair");
-            jQuery("#drawRectangleButton").removeClass("active");
-            jQuery("#drawFreelineButton").removeClass("active");
-            jQuery("#drawDotButton").addClass("active");
-       }   
-    }.bind(this)); 
-    // Dot Tool end
-	  
-    this.ellipsebutton.on('click', function () {
-      // this.mode = 'ellipse'
-      // this.annotools.mode = 'ellipse'
-      // this.annotools.drawMarkups()
-      alert('Creation of markups is disabled on QuIP')
-    }.bind(this))
-
-    this.pencilbutton.on('click', function () {
-
-      if(this.annotools.mode == 'pencil'){
-        this.setNormalMode();
-      } else {
-        //set pencil mode
-        this.annotools.mode = 'pencil'
-        this.annotools.drawMarkups()
-        
-        jQuery("canvas").css("cursor", "crosshair");
-        //jQuery("drawFreelineButton").css("opacity", 1);
-        jQuery("#drawRectangleButton").removeClass("active");
-        jQuery("#drawDotButton").removeClass("active");     // Dot Tool
-        jQuery("#drawFreelineButton").addClass("active");
-
-      }
-
-    }.bind(this))
-
-    this.measurebutton.on('click', function () {
-      this.mode = 'measure'
-      this.drawMarkups()
-    }.bind(this))
-
     this.hidebutton.on('click', function () {
       this.annotools.toggleMarkups()
     }.bind(this))
@@ -425,15 +260,6 @@ ToolBar.prototype.createButtons = function () {
     // this.removeMouseEvents()
     // this.promptForAnnotation(null, "filter", this, null)
     }.bind(this))
-	/*
-    this.analyticsbutton.on('click', function () {
-      this.annotools.createWorkOrder()
-    }.bind(this))
-
-    this.filterImgButton.on('click', function () {
-      this.FilterTools.showFilterControls()
-    }.bind(this))
-	*/
 
     this.heatUpButton.on('click', function () {
 	this.annotools.heatmap_opacity = Math.min(1, this.annotools.heatmap_opacity + 0.1);
@@ -526,12 +352,6 @@ ToolBar.prototype.createButtons = function () {
     */
 
   }
-  this.colorMapButton = jQuery('<img>', {
-    'class': 'colorMapButton',
-    'title': 'ColorMap',
-    'src': 'images/colors.svg'
-  })
-  tool.append(this.colorMapButton)
   this.ajaxBusy = jQuery('<img>', {
     'class': 'colorMapButton',
     'id': 'ajaxBusy',
@@ -564,248 +384,3 @@ ToolBar.prototype.createButtons = function () {
   }
 }
 
-/*
-ToolBar.prototype.drawMarkups= function () //Draw Markups
-{
-    //console.log(this.annotools)
-    //this.showMessage() //Show Message
-    this.annotools.removeMouseEvents()
-    //this.annotools.drawCanvas.off('mouseup')
-    //this.annotools.drawCanvas.off('mousedown')
-    //this.annotools.drawCanvas.off('mousemove')
-    
-    this.annotools.drawLayer.show() //Show The Drawing Layer
-/* ASHISH Disable quit
-    this.quitbutton.show() //Show The Quit Button
-
-    //this.magnifyGlass.hide() //Hide The Magnifying Tool
-    this.container = document.id(this.canvas) //Get The Canvas Container
-    this.container = document.getElementsByClassName(this.canvas)[0] //Get The Canvas Container
-    this.container = document.getElementById('container') //Get The Canvas Container
-    if (this.container) {
-        //var left = parseInt(this.container.offsetLeft), //Get The Container Location
-        var left = parseInt(this.container.getLeft()), //Get The Container Location
-            top = parseInt(this.container.offsetTop),
-            width = parseInt(this.container.offsetWidth),
-            height = parseInt(this.container.offsetHeight),
-            oleft = left,
-            otop = top,
-            owidth = width,
-            oheight = height
-        //console.log("left: " + left + " top: " + top + " width: " + width + " height: " + height)
-        if (left < 0) {
-            left = 0
-            width = window.innerWidth
-        } //See Whether The Container is outside The Current ViewPort
-        if (top < 0) {
-            top = 0
-            height = window.innerHeight
-        }
-        //Recreate The CreateAnnotation Layer Because of The ViewPort Change Issue.
-        this.annotools.drawLayer.css({
-                left: left,
-                top: top,
-                width: width,
-                height: height,
-                background: "#ccc"
-        })
-        //Create Canvas on the CreateAnnotation Layer
-        this.annotools.drawCanvas.css({
-            width: width,
-            height: height
-        })
-        console.log(this.annotools.drawLayer)
-        //The canvas context
-        var ctx = this.annotools.drawCanvas[0].getContext("2d")
-        //Draw Markups on Canvas
-        switch (this.mode) {
-            case "rect":
-                //console.log("rectangle")
-                this.drawRectangle(ctx)
-                break
-            case "ellipse":
-                this.drawEllipse(ctx)
-                break
-            case "pencil":
-                this.drawPencil(ctx)
-                break
-            case "polyline":
-                this.drawPolyline(ctx)
-                break
-            case "measure":
-                this.drawMeasure(ctx)
-                break
-        }
-    } else this.showMessage("Container Not SET Correctly Or Not Fully Loaded Yet")
- 
-}
-
-ToolBar.prototype.drawRectangle= function(ctx)
-{
-    //console.log("drawing rectangle...............");    
-    this.annotools.removeMouseEvents()
-    
-    var started = false
-    var min_x,min_y,max_x,max_y,w,h
-    var startPosition
-    this.annotools.drawCanvas.on('mousedown',function(e)
-    {
-        started = true
-        startPosition = OpenSeadragon.getMousePosition(e.event)
-        x = startPosition.x
-        y = startPosition.y
-    })
-
-    this.annotools.drawCanvas.on('mousemove',function(e)
-    {
-        if(started)
-        {
-        //console.log(e.event)
-        ctx.clearRect(0,0,this.drawCanvas.width, this.drawCanvas.height)
-        var currentMousePosition = OpenSeadragon.getMousePosition(e.event)
-
-        min_x = Math.min(currentMousePosition.x,startPosition.x)
-        min_y = Math.min(currentMousePosition.y,startPosition.y)
-        max_x = Math.max(currentMousePosition.x,startPosition.x)
-        max_y = Math.max(currentMousePosition.y,startPosition.y)
-        w = Math.abs(max_x - min_x)
-        h = Math.abs(max_y - min_y)
-        ctx.strokeStyle = this.color
-        ctx.strokeRect(min_x,min_y,w,h)
-        }
-    }.bind(this))
-
-    this.annotools.drawCanvas.on('mouseup',function(e)
-    {
-        started = false
-        var finalMousePosition = new OpenSeadragon.getMousePosition(e.event)
-
-            min_x = Math.min(finalMousePosition.x,startPosition.x)
-            min_y = Math.min(finalMousePosition.y,startPosition.y)
-            max_x = Math.max(finalMousePosition.x,startPosition.x)
-            max_y = Math.max(finalMousePosition.y,startPosition.y)
-
-        
-        var startRelativeMousePosition = new OpenSeadragon.Point(min_x,min_y).minus(OpenSeadragon.getElementOffset(viewer.canvas))
-        var endRelativeMousePosition = new OpenSeadragon.Point(max_x,max_y).minus(OpenSeadragon.getElementOffset(viewer.canvas))
-        var newAnnot = {
-            x: startRelativeMousePosition.x,
-            y: startRelativeMousePosition.y,
-            w: w,
-            h: h,
-            type: "rect",
-            color: this.color,
-            loc: new Array()
-        }
-
-        var globalNumbers = JSON.parse(this.convertFromNative(newAnnot, endRelativeMousePosition))
-
-        newAnnot.x = globalNumbers.nativeX
-        newAnnot.y = globalNumbers.nativeY
-        newAnnot.w = globalNumbers.nativeW
-        newAnnot.h = globalNumbers.nativeH
-        var loc = new Array()
-        loc[0] = parseFloat(newAnnot.x)
-        loc[1] = parseFloat(newAnnot.y)
-        newAnnot.loc = loc
-            this.promptForAnnotation(newAnnot, "new", this, ctx)
-    }.bind(this))
-    
-}
-
-ToolBar.prototype.drawPencil= function(ctx)
-{
-    this.annotools.removeMouseEvents()
-    var started = false
-    var pencil = []
-    var newpoly = []
-    this.drawCanvas.addEvent('mousedown',function(e)
-    {
-        started = true
-        var startPoint = OpenSeadragon.getMousePosition(e.event)
-        var relativeStartPoint = startPoint.minus(OpenSeadragon.getElementOffset(viewer.canvas))
-        newpoly.push({
-        "x":relativeStartPoint.x,
-        "y":relativeStartPoint.y
-        })
-        ctx.beginPath()
-        ctx.moveTo(relativeStartPoint.x, relativeStartPoint.y)
-        ctx.strokeStyle = this.color
-        ctx.stroke()
-    }.bind(this))
-
-    this.drawCanvas.addEvent('mousemove',function(e)
-    {
-        var newPoint = OpenSeadragon.getMousePosition(e.event)
-        var newRelativePoint = newPoint.minus(OpenSeadragon.getElementOffset(viewer.canvas))
-        if(started)
-        {
-        newpoly.push({
-            "x":newRelativePoint.x,
-            "y":newRelativePoint.y
-            })
-
-        ctx.lineTo(newRelativePoint.x,newRelativePoint.y)
-        ctx.stroke()
-        }
-    })
-
-    this.drawCanvas.addEvent('mouseup',function(e)
-    {
-        started = false
-        pencil.push(newpoly)
-        newpoly = []
-        numpoint = 0
-        var x,y,w,h
-        x = pencil[0][0].x
-        y = pencil[0][0].y
-
-        var maxdistance = 0
-        var points = ""
-        var endRelativeMousePosition
-        for(var i = 0; i < pencil.length; i++)
-        {
-        newpoly = pencil[i]
-        for(j = 0; j < newpoly.length - 1; j++)
-        {
-            points += newpoly[j].x + ',' + newpoly[j].y + ' '
-            if(((newpoly[j].x - x) * (newpoly[j].x - x) + (newpoly[j].y -y) * (newpoly[j].y-y)) > maxdistance)
-            {
-            maxdistance = ((newpoly[j].x - x) * (newpoly[j].x - x) + (newpoly[j].y -y) * (newpoly[j].y-y))
-            var endMousePosition = new OpenSeadragon.Point(newpoly[j].x, newpoly[j].y)
-            endRelativeMousePosition = endMousePosition.minus(OpenSeadragon.getElementOffset(viewer.canvas))
-            }
-        }
-
-        points = points.slice(0,-1)
-        points += ';'
-        }
-
-        points = points.slice(0,-1)
-
-        var newAnnot = {
-            x:x,
-            y:y,
-            w:w,
-            h:h,
-            type: 'pencil',
-            points: points,
-            color: this.color,
-            loc: new Array()
-        }
-
-        var globalNumbers = JSON.parse(this.convertFromNative(newAnnot, endRelativeMousePosition))
-        newAnnot.x = globalNumbers.nativeX
-        newAnnot.y = globalNumbers.nativeY
-        newAnnot.w = globalNumbers.nativeW
-        newAnnot.h = globalNumbers.nativeH
-        newAnnot.points = globalNumbers.points
-        var loc = new Array()
-        loc[0] = parseFloat(newAnnot.x)
-        loc[1] = parseFloat(newAnnot.y)
-        newAnnot.loc = loc
-            this.promptForAnnotation(newAnnot, "new", this, ctx)
-    }.bind(this))
-}
-
-*/

@@ -93,6 +93,16 @@ var annotools = function (options) {
   cb1.addEventListener('change', this.checkboxChange.bind(this), false);
   cb2.addEventListener('change', this.checkboxChange.bind(this), false);
 
+  // Added code for temp radio box on weights
+  var lymse = document.getElementById('LymSe');
+  var necse = document.getElementById('NecSe');
+  var bothse = document.getElementById('BothSe');
+  lymse.addEventListener('change', this.lymnecWeightChange.bind(this), false);
+  necse.addEventListener('change', this.lymnecWeightChange.bind(this), false);
+  bothse.addEventListener('change', this.lymnecWeightChange.bind(this), false);
+  cb1.style.visibility = "hidden";
+  cb2.style.visibility = "hidden";
+
   /*
    * OpenSeaDragon events
    */
@@ -841,6 +851,16 @@ annotools.prototype.addnewAnnot = function (newAnnot) // Add New Annotations
 
   this.displayGeoAnnots()
 }
+
+annotools.prototype.addnewAnnot_Array = function (newAnnot_arr) // Add New Annotations
+{
+  for (i = 0; i< newAnnot_arr.length; i++) {
+ 	this.saveAnnot_noRefresh(newAnnot_arr[i]);
+  }
+  this.getMultiAnnot();
+  this.displayGeoAnnots();
+}
+
 /*ASHISH DIsable quit
 quitMode: function () //Return To the Default Mode
 {
@@ -1201,8 +1221,8 @@ annotools.prototype.updateAnnot = function (annot) // Save Annotations
 annotools.prototype.saveAnnot = function (annotation) // Save Annotations
 {
   var self = this;
-  console.log('Save annotation function')
-  console.log(annotation)
+  //console.log('Save annotation function')
+  //console.log(annotation)
   jQuery.ajax({
     'type': 'POST',
     url: 'api/Data/getAnnotSpatial.php',
@@ -1215,9 +1235,9 @@ annotools.prototype.saveAnnot = function (annotation) // Save Annotations
       } else {   
         //alert("Successfully saved markup!");
       }
-      console.log(err)
+      //console.log(err)
       self.getMultiAnnot();
-      console.log('succesfully posted')
+      //console.log('succesfully posted')
     }
   })
 
@@ -1241,6 +1261,30 @@ var jsonRequest = new Request.JSON({
     'annot': this.annotations
 })
 */
+}
+
+annotools.prototype.saveAnnot_noRefresh = function (annotation) // Save Annotations
+{
+  var self = this;
+  //console.log('Save annotation function')
+  //console.log(annotation)
+  jQuery.ajax({
+    'type': 'POST',
+    url: 'api/Data/getAnnotSpatial.php',
+    data: annotation,
+    success: function (res, err) {
+      console.log("response: ")
+      console.log(res)
+      if(res == "unauthorized"){
+        alert("Error saving markup! Wrong secret");
+      } else {
+        //alert("Successfully saved markup!");
+      }
+      //console.log(err)
+      //self.getMultiAnnot();
+      //console.log('succesfully posted')
+    }
+  })
 }
 
 annotools.prototype.convertToNative = function (annot) {
@@ -1339,8 +1383,10 @@ annotools.prototype.convertFromNative = function (annot, end) {
     var x_end = end.x
     var y_end = end.y
 
+
     var nativeX_end = this.imagingHelper.physicalToLogicalX(x_end)
     var nativeY_end = this.imagingHelper.physicalToLogicalY(y_end)
+
     var nativeX = this.imagingHelper.physicalToLogicalX(x)
     var nativeY = this.imagingHelper.physicalToLogicalY(y)
     var nativeW = nativeX_end - nativeX
@@ -1382,6 +1428,13 @@ annotools.prototype.convertFromNative = function (annot, end) {
     var nativeW = nativeX_end - nativeX
     var nativeH = nativeY_end - nativeY
     var nativePoints = points
+
+    console.log(x_end);
+    console.log(nativeX_end);
+    console.log(nativeY_end);
+    //console.log(nativeX);
+    //console.log(nativeW);
+    //console.log(nativePoints);
 
     var globalNumber = JSON.encode({nativeW: nativeW, nativeH: nativeH, nativeX: nativeX, nativeY: nativeY,points: nativePoints})
 
@@ -3052,6 +3105,13 @@ annotools.prototype.checkboxChange = function(event)
 	{
 	}
 	self.getMultiAnnot();
+}
+
+// Added for temp weight boxes
+annotools.prototype.lymnecWeightChange = function(event)
+{
+        var self = this;
+        self.getMultiAnnot();
 }
 
 annotools.prototype.saveHeatmapWeight = function(event)

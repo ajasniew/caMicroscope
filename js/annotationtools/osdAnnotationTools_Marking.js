@@ -101,12 +101,15 @@ annotools.prototype.drawMarking = function (ctx) {
           maxdistance = ((newpoly[j].x - x) * (newpoly[j].x - x) + (newpoly[j].y - y) * (newpoly[j].y - y))
           var endMousePosition = new OpenSeadragon.Point(newpoly[j].x, newpoly[j].y)
           endRelativeMousePosition = endMousePosition.minus(OpenSeadragon.getElementOffset(viewer.canvas))
+	  //console.log(endMousePosition);
+	  //console.log(endRelativeMousePosition);
         }
       }
 
       console.log(points);
+      console.log(endMousePosition);
       points = points.slice(0, -1)
-      console.log(points);
+      //console.log(points);
       points += ';'
     }
     points = points.slice(0, -1)
@@ -183,7 +186,6 @@ annotools.prototype.breakAndConvertToGeo = function ()
       				color: this.color_arr[i],
       				loc: [parseFloat(brokenAnnot.nativeX_set[j]), parseFloat(brokenAnnot.nativeY_set[j])]
     			};
-			console.log(newAnnot);
 			var geojsonAnnot = this.convertPencilToGeo(newAnnot);
 			geojsonAnnot.object_type = 'marking';
 			this.anno_arr.push(geojsonAnnot);
@@ -198,20 +200,35 @@ annotools.prototype.saveMarking = function (newAnnot, mark_type) {
 	'mark_type': mark_type,
 	'username': this.username
     }
-    console.log(newAnnot);
+    //console.log(newAnnot);
     newAnnot.properties.annotations = val;
-    console.log(newAnnot.properties.annotations.secret);
+    //console.log(newAnnot.properties.annotations.secret);
     this.addnewAnnot(newAnnot);
+}
+
+annotools.prototype.saveMarking_arr = function (newAnnot_arr, mark_type_arr) {
+    for (iAnn = 0; iAnn < newAnnot_arr.length; iAnn++) {
+	var val = {
+            'secret': 'mark1',
+            'mark_type': mark_type_arr[iAnn],
+            'username': this.username
+	}
+	newAnnot_arr[iAnn].properties.annotations = val;
+    }
+    this.addnewAnnot_Array(newAnnot_arr);
 }
 
 annotools.prototype.markSave = function (notification, isSetNormalMode) {
     console.log(this.anno_arr.length);
-    //this.breakAndConvertToGeo();
+    this.breakAndConvertToGeo();
+    /*
     for (i = 0; i< this.anno_arr.length; i++)
     {
-	this.saveMarking(this.anno_arr[i], this.marktype_arr[i]);
-	//this.saveMarking(this.anno_arr[i], this.marktype_broken_arr[i]);
+	//this.saveMarking(this.anno_arr[i], this.marktype_arr[i]);
+	this.saveMarking(this.anno_arr[i], this.marktype_broken_arr[i]);
     }
+    */
+    this.saveMarking_arr(this.anno_arr, this.marktype_broken_arr);
     if (notification == true) {
 	alert("Saved markup");
     }
@@ -313,6 +330,7 @@ annotools.prototype.radiobuttonChange = function(event) {
 
 annotools.prototype.break_drawings = function(nativepoints) {
     patch_size = 0.001;
+    max_n_point = 10;
     coordinate_set = [];
     nativeX_set = [];
     nativeY_set = [];
@@ -326,8 +344,16 @@ annotools.prototype.break_drawings = function(nativepoints) {
     if (nativepoints.length == 0)
         return [coordinate_set, nativeX_set, nativeY_set, nativeW_set, nativeH_set];
 
+    //console.log('original native points');
+    //console.log(nativepoints);
+
+
     x_old = nativepoints[0][0];
     y_old = nativepoints[0][1];
+    x_start = x_old;
+    y_start = y_old;
+    coor_str = x_start + ',' + y_start;
+    n_point = 0;
     for (k = 0; k < nativepoints.length; k++) {
         x = nativepoints[k][0];
         y = nativepoints[k][1];
@@ -337,48 +363,56 @@ annotools.prototype.break_drawings = function(nativepoints) {
         if ((divn < 1) && (k != nativepoints.length - 1)) {
             continue;
         }
-        dir_x = (x-x_old) / len;
-        dir_y = (y-y_old) / len;
-        coor = [];
-	coor_str = '';
-        for (ps = 0; ps <= divn; ps++) {
-	    added_X = x_old + dir_x * ps;
-	    added_Y = y_old + dir_y * ps;
-            coor.push([added_X, added_Y]);
+        no_seg = Math.ceil(len / patch_size);
+	dir_x = (x-x_old) / no_seg;
+	dir_y = (y-y_old) / no_seg;
 
-	    coor_str += added_X + ',' + added_Y + ' ';
-	    
-        }
-        coor.push([x, y]);
-	coor_str += x + ',' + y;
-        coordinate_set.push(coor_str);
+	for (ps = 0; ps < no_seg; ps++) {
+		added_X = x_old + dir_x * ps;
+		added_Y = y_old + dir_y * ps;
+		coor_str += ' ' + added_X.toFixed(6) + ',' + added_Y.toFixed(6);
+		n_point ++;
+	}
+	
+	coor_str += ' ' + x.toFixed(6) + ',' + y.toFixed(6);
+	n_point ++;
 
-	//raw_end_point = new OpenSeadragon.Point(coor[divn+1][0], coor[divn+1][1]);
-	//end_point = endMousePosition.minus(OpenSeadragon.getElementOffset(viewer.canvas));
-	end_point_X = coor[divn+1][0];// - canvas_offset_x;
-	end_point_Y = coor[divn+1][1];// - canvas_offset_y;
-        nativeX_set.push(coor[0][0]);
-        nativeY_set.push(coor[0][1]);
-        //nativeW_set.push(coor[divn+1][0]-coor[0][0]);		// change from "divn+2" to "divn+1"
-        //nativeH_set.push(coor[divn+1][1]-coor[0][1]);		// change from "divn+2" to "divn+1"
-        console.log(coor[divn+1][0]);
-        console.log(canvas_offset_x);
-        console.log(end_point_X);
-	console.log(coor[0][0]);
-        nativeW_set.push(end_point_X-coor[0][0]);
-	nativeH_set.push(end_point_Y-coor[0][1]);
+        if (n_point >= max_n_point || k == nativepoints.length - 1) {
+        	coordinate_set.push(coor_str);
+	        nativeX_set.push(x_start);
+	        nativeY_set.push(y_start);
+		nativeW_set.push(0.1);
+		nativeH_set.push(0.1);
+		x_start = x;
+		y_start = y;
+    		coor_str = x_start + ',' + y_start;
+		n_point = 0;
+	}
 
         x_old = x;
         y_old = y;
     }
+
+    //console.log(coordinate_set);
     return result = JSON.encode({coordinate_set:coordinate_set, nativeX_set:nativeX_set, nativeY_set:nativeY_set, nativeW_set:nativeW_set, nativeH_set:nativeH_set});
-    //return [coordinate_set, nativeX_set, nativeY_set, nativeW_set, nativeH_set];
+}
+
+annotools.prototype.separate_line = function(coor_list) {
+    max_point = 300;
+    coor_list_arr = [];
+    curr_seg = 0;
+    for (ps = 0; ps < coor_list.length; ps += max_point, curr_seg++) {
+	for (subps = ps; subps< Math.min(coor_list.length, ps + max_point); subps++)
+	{
+		console.log('abc');
+	}
+    }
 }
 
 
 annotools.prototype.calculateIntersect = function() {
     var marking_sample_rate = 1;
-    var center_dis = 1.25;
+    var center_dis = 1.4;
     var annotations = this.annotations;
 
     var labels = [];

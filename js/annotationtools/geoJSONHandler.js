@@ -292,7 +292,7 @@ annotools.prototype.generateSVG = function (annotations) {
     {
 	highres = false;
     }
-    console.log(highres);
+
     for (var i = 0; i < annotations.length; i++) {
       var annotation = annotations[i]
 	//console.log(annotation.footprint);
@@ -307,8 +307,9 @@ annotools.prototype.generateSVG = function (annotations) {
 
       if (annotation.object_type == 'marking' && (annotation.properties.annotations.mark_type == 'LymPos' || annotation.properties.annotations.mark_type == 'LymNeg'))
       {
-		continue;
+		//continue;
       }
+
 
       var id = '';
       
@@ -362,6 +363,10 @@ annotools.prototype.generateSVG = function (annotations) {
 		var nec_color_index = nec_score >= nec_weight ? 1 : 0;
 		var lym_checked = document.getElementById('cb1').checked;
 		var nec_checked = document.getElementById('cb2').checked;
+
+		// Added for temp weight boxes
+		lym_checked = (document.getElementById('LymSe').checked || document.getElementById('BothSe').checked);
+		nec_checked = (document.getElementById('NecSe').checked || document.getElementById('BothSe').checked);
 
 		if (intersect_label[i] != 0)
 		{
