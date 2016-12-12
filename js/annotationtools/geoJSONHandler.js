@@ -253,7 +253,7 @@ var clickSVG = function(evt, annotation){
 annotools.prototype.generateSVG = function (annotations) {
   // console.log(annotation)
   // var annotation = annotations[ii]
-  var intersect_label = this.calculateIntersect();
+  //var intersect_label = this.calculateIntersect();
   var self =this;
   var annotations = this.annotations
   if (annotations) {
@@ -292,6 +292,8 @@ annotools.prototype.generateSVG = function (annotations) {
     {
 	highres = false;
     }
+
+    var intersect_label = this.calculateIntersect(highres);
 
     for (var i = 0; i < annotations.length; i++) {
       var annotation = annotations[i]

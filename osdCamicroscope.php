@@ -64,30 +64,30 @@
         <script src="js/dependencies/simplemodal.js"></script>
         <script src="js/dependencies/d3.js"></script>
         <style type="text/css">
-            .openseadragon
-            {
-                height: 100%;
-                min-height: 100%;
-                width: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
-                margin: 0;
-                padding: 0;
-                background-color: #E8E8E8;
-                border: 1px solid black;
-                color: white;
-            }
+        .openseadragon
+        {
+            height: 100%;
+            min-height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 0;
+            padding: 0;
+            background-color: #E8E8E8;
+            border: 1px solid black;
+            color: white;
+        }
         .controls textarea{
           height: 50px;
         }
         .navWindow
         {
             position: absolute;
-                z-index: 10001;
-                right: 0;
-                bottom: 0;
-                border: 1px solid yellow;
+            z-index: 10001;
+            right: 0;
+            bottom: 0;
+            border: 1px solid yellow;
         }
 .modal a.close-modal{
   top: 0;
@@ -100,19 +100,13 @@
 
     <body>
 
-        <div id="container">
-                    
-            <div id="tool"></div>
-            <div id="panel"></div>
-	    <!-- <div id="weightpanel"><div id="slide"></div></div> -->
-	    <!-- <div id="weightpanel"><div id="bar1" class="bar" align="right"><div id="slide1" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb1" checked>  Lymphocyte Sensitivity</label><div id="bar2" class="bar"><div id="slide2" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb2" checked> Necrosis Specificity</label><br><button type="button" class="btn_heatmap" id="btn_saveHeatmapWeight">Finalize weights</button></div> -->
-	    <!-- <div id="weightpanel"><div id="bar1" class="bar" align="right"><div id="slide1" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb1" checked>  Lymphocyte Sensitivity</label><div id="bar2" class="bar"><div id="slide2" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb2" checked> Necrosis Specificity</label><br><button type="button" class="btn_heatmap" id="btn_saveHeatmapWeight">Finalize</button></div> -->
-	    <div id="weightpanel"><div id="bar1" class="bar" align="right"><div id="slide1" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb1" checked>  Lymphocyte Sensitivity</label><div id="bar2" class="bar"><div id="slide2" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb2" checked> Necrosis Specificity</label><br>  <input type="radio" name="weighttype" value="LymSe" id="LymSe"> <label for="LymSe" class=radio_markup>Lymphocyte Prediction</label> <br> <input type="radio" name="weighttype" value="NecSe" id="NecSe"> <label for="NecSe" class=radio_markup>Necrosis Prediction</label> <br> <input type="radio" name="weighttype" value="BothSe" id="BothSe" checked> <label for="BothSe" class=radio_markup>Lym Prediction with Nec Filtering</label> <br> <button type="button" class="btn_heatmap" id="btn_saveHeatmapWeight">Finalize</button></div>
+        <div id="tool"></div>
 
+        <div id="weightpanel"><div id="bar1" class="bar" align="right"><div id="slide1" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb1" checked>  Lymphocyte Sensitivity</label><div id="bar2" class="bar"><div id="slide2" class="slide"></div></div><label class="lb_heatmap"><input type="checkbox" id="cb2" checked> Necrosis Specificity</label><br><p>
 
+<br><p><input type="radio" name="weighttype" value="LymSe" id="LymSe"> <label for="LymSe" class=radio_markup>Lymphocyte Prediction</label> <br> <input type="radio" name="weighttype" value="NecSe" id="NecSe"> <label for="NecSe" class=radio_markup>Necrosis Prediction</label> <br> <input type="radio" name="weighttype" value="BothSe" id="BothSe" checked> <label for="BothSe" class=radio_markup>Lym Prediction with Nec Filtering</label> <br> <button type="button" class="btn_heatmap" id="btn_saveHeatmapWeight">Finalize</button></div>
 
-	    <div id="markuppanel"><input type="radio" name="marktype" value="LymPos" checked="checked" id="LymPos" class="radio_markup"> <label for="LymPos" class=radio_markup>LymPos</label><br><input type="radio" name="marktype" value="LymNeg" id="LymNeg" class="radio_markup"> <label for="LymNeg" class=radio_markup>LymNeg</label><br><input type="radio" name="marktype" value="TumorPos" id="TumorPos" class="radio_markup"> <label for="TumorPos" class=radio_markup>TumorPos</label><br><input type="radio" name="marktype" value="TumorNeg" id="TumorNeg" class="radio_markup"> <label for="TumorNeg" class=radio_markup>TumorNeg</label><br> <input type="radio" name="marktype" value="Moving" id="rb_Moving" class="radio_markup"> <label for="rb_Moving" class=radio_markup>Moving</label><br>  <button type="button" class="btn_mark" id="btn_savemark">Save</button>  <button type="button" class="btn_mark" id="btn_undomark" >Undo</button> </div>
-	    <!-- <div id="markuppanel"><input type="radio" name="marktype" value="LymPos" checked="checked" id="LymPos" class="radio_markup"> <label class = radio_markup>LymPos</label><br><input type="radio" name="marktype" value="LymNeg" id="LymNeg" class="radio_markup"> <label class = radio_markup>LymNeg</label><br><input type="radio" name="marktype" value="TumorPos" id="TumorPos" class="radio_markup"> <label class = radio_markup>TumorPos</label><br><input type="radio" name="marktype" value="TumorNeg" id="TumorNeg" class="radio_markup"> <label class = radio_markup>TumorNeg</label><br> <button type="button" class="btn_heatmap" id="btn_savemark" class="radio_markup">Save</button></div> -->
+	<div id="markuppanel"><input type="radio" name="marktype" value="LymPos" checked="checked" id="LymPos" class="radio_markup"> <label for="LymPos" class=radio_markup>LymPos (draw across)</label><br><input type="radio" name="marktype" value="LymNeg" id="LymNeg" class="radio_markup"> <label for="LymNeg" class=radio_markup>LymNeg (draw across)</label><br><input type="radio" name="marktype" value="TumorPos" id="TumorPos" class="radio_markup"> <label for="TumorPos" class=radio_markup>TumorPos (draw around)</label><br><input type="radio" name="marktype" value="TumorNeg" id="TumorNeg" class="radio_markup"> <label for="TumorNeg" class=radio_markup>TumorNeg (draw around)</label><br> <input type="radio" name="marktype" value="Moving" id="rb_Moving" class="radio_markup"> <label for="rb_Moving" class=radio_markup>Save then Move Around</label><br>  <button type="button" class="btn_mark" id="btn_savemark">Save</button>  <button type="button" class="btn_mark" id="btn_undomark" >Cancel</button> </div>
         <div id="algosel"><div id="tree"></div></div>
 
             <div class="demoarea">
@@ -167,7 +161,7 @@
             imagingHelper.setMaxZoom(2);
             //console.log(this.MPP);
             viewer.scalebar({
-              type: OpenSeadragon.ScalebarType.MAP,
+              type: OpenSeadragon.ScalebarType.MICROSCOPY,
               pixelsPerMeter: (1/(parseFloat(this.MPP["mpp_x"])*0.000001)),
               xOffset: 5,
               yOffset: 10,
@@ -217,7 +211,7 @@ function isAnnotationActive(){
         var bound_y = <?php echo json_encode($_GET['y']); ?>;
         var zoom = <?php echo json_encode($_GET['zoom']); ?> || viewer.viewport.getMaxZoom();
 
-        jQuery("#panel").hide();
+        //jQuery("#panel").hide();
 	jQuery("#weightpanel").hide();
 	jQuery("#markuppanel").hide();
         if(bound_x && bound_y){

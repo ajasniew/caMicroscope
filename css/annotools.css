@@ -424,3 +424,8 @@
   display: block;
   font-weight: 600;
 }
+
+input[type='radio'] {
+  transform: scale(1.4);
+}
+

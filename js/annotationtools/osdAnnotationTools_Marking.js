@@ -263,6 +263,7 @@ annotools.prototype.undoStroke = function () {
     this.newpoly_arr.pop();
     this.color_arr.pop();
     this.anno_arr.pop();
+    this.rawAnnotArray.pop();
     this.marktype_arr.pop();
     console.log(this.color_arr);
     this.reDrawCanvas();
@@ -330,7 +331,7 @@ annotools.prototype.radiobuttonChange = function(event) {
 
 annotools.prototype.break_drawings = function(nativepoints) {
     patch_size = 0.001;
-    max_n_point = 10;
+    max_n_point = 4;
     coordinate_set = [];
     nativeX_set = [];
     nativeY_set = [];
@@ -379,10 +380,10 @@ annotools.prototype.break_drawings = function(nativepoints) {
 
         if (n_point >= max_n_point || k == nativepoints.length - 1) {
         	coordinate_set.push(coor_str);
-	        nativeX_set.push(x_start);
-	        nativeY_set.push(y_start);
-		nativeW_set.push(0.1);
-		nativeH_set.push(0.1);
+	        nativeX_set.push((x_start+x)/2);
+	        nativeY_set.push((y_start+y)/2);
+		nativeW_set.push(0.2);
+		nativeH_set.push(0.2);
 		x_start = x;
 		y_start = y;
     		coor_str = x_start + ',' + y_start;
@@ -410,9 +411,9 @@ annotools.prototype.separate_line = function(coor_list) {
 }
 
 
-annotools.prototype.calculateIntersect = function() {
+annotools.prototype.calculateIntersect = function(high_res) {
     var marking_sample_rate = 1;
-    var center_dis = 1.4;
+    var center_dis = 1.25;
     var annotations = this.annotations;
 
     var labels = [];
@@ -426,7 +427,8 @@ annotools.prototype.calculateIntersect = function() {
     }
 
     // get heatmap patch centers
-    half_patch_size = 0;
+    hps_small = 1.0;
+    hps_big = 0.0;
     for (var i = 0; i < annotations.length; i++) {
         var annotation = annotations[i];
         labels.push(0);
@@ -436,15 +438,25 @@ annotools.prototype.calculateIntersect = function() {
             id.push(i);
             cx.push((nativepoints[0][0] + nativepoints[2][0])/2.0);
             cy.push((nativepoints[0][1] + nativepoints[2][1])/2.0);
-            half_patch_size = (Math.abs(nativepoints[0][0] - nativepoints[1][0]) + Math.abs(nativepoints[0][1] - nativepoints[1][1])) / 2.0;
+            hps = (Math.abs(nativepoints[0][0] - nativepoints[1][0]) + Math.abs(nativepoints[0][1] - nativepoints[1][1])) / 2.0;
+            if (hps < hps_small) {
+                hps_small = hps;
+            }
+            if (hps > hps_big) {
+                hps_big = hps;
+            }
         }
     }
 
-    if (half_patch_size == 0) {
-	return;
+    if (high_res) {
+        var dis = center_dis * hps_small;
+    } else {
+        var dis = center_dis * hps_big;
     }
 
-    var dis = center_dis * half_patch_size;
+    if (dis == 0) {
+	return;
+    }
 
     // traverse markings
     for (var i = 0; i < annotations.length; i++) {

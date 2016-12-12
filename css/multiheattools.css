@@ -21,17 +21,17 @@
 
 
 #weightpanel {
-    width: 220px;
+    width: 235px;
     font-family: Arial, Roboto;                                                               
     font-size: 12px;                                                                          
-    height: 280px;                                                                            
+    height: 315px;                                                                            
     top: 60px;                                                                                
     left: 0;
     position: fixed;                                                                          
     z-index: 900999;
     background: #1976D2;
     box-shadow:1px 1px 1px 1px  #555;                                                         
-    //padding: 15px;
+    padding: 10px;
     border-radius: 10px;                                                                       
     color: #fff;
     opacity: 0.9;                                                                             
@@ -39,17 +39,17 @@
 }
 
 #markuppanel {
-    width: 180px;
+    width: 190px;
     font-family: Arial, Roboto;
     font-size: 12px;
-    height: 170px;
+    height: 190px;
     top: 60px;
     left: 0;
     position: fixed;
     z-index: 900999;
     background: #1976D2;
     box-shadow:1px 1px 1px 1px  #555;
-    //padding: 15px;
+    padding: 10px;
     border-radius: 10px;
     color: #fff;
     opacity: 0.9;
@@ -83,6 +83,6 @@
 
 .radio_markup {
 	position:relative;
-	top:7px;
-        left:7px;
+	top:0px;
+        left:0px;
 }

@@ -46,6 +46,10 @@ function goodalgo (data, status) {
     n.title = "<div class='colorBox' style='background:" + available_colors[i] + "'></div>" + data[i].title
     n.key = i.toString()
     n.refKey = data[i].provenance.analysis_execution_id
+    if (n.refKey == 'lymphocyte_necrosis_6' || n.refKey == 'humanmark' || n.refKey == 'lymphocyte_necrosis_555_lowresmax') {
+      n.selected = true
+    }
+
     n.color = available_colors[i]
     algorithm_color[data[i].provenance.analysis_execution_id] = available_colors[i]
     blob.push(n)
@@ -93,6 +97,8 @@ function goodalgo (data, status) {
       annotool.getMultiAnnot()
     }
   })
+  jQuery('#tree').attr('algotree', true)
+  annotool.getMultiAnnot()
 }
 
 ToolBar.prototype.toggleAlgorithmSelector = function () {
@@ -137,7 +143,7 @@ ToolBar.prototype.setNormalMode = function() {
   jQuery("#drawFreelineButton").removeClass('active');
   jQuery("#drawDotButton").removeClass("active");   // Dot Tool
   jQuery("#freeLineMarkupButton").removeClass("active");
-  jQuery("#markuppanel").hide('slide');
+  jQuery("#markuppanel").hide();
   this.annotools.drawLayer.hide()
   this.annotools.addMouseEvents()       
 }
@@ -275,7 +281,7 @@ ToolBar.prototype.createButtons = function () {
 	console.log('click on showing weight panel');
 	if (jQuery('#weightpanel').is(":visible"))
 	{
-		jQuery('#weightpanel').hide('slide');
+		jQuery('#weightpanel').hide();
 	}
 	else
 	{
@@ -284,7 +290,7 @@ ToolBar.prototype.createButtons = function () {
 			this.annotools.loadedWeight = true;
 		}
 		console.log(this.annotools.heat_weight);
-		jQuery('#weightpanel').show('slide');
+		jQuery('#weightpanel').show();
 	}
     }.bind(this))
 
@@ -304,7 +310,7 @@ ToolBar.prototype.createButtons = function () {
         jQuery("#drawDotButton").removeClass("active");     // Dot Tool
 	jQuery("#drawFreelineButton").removeClass("active");
         jQuery("#freeLineMarkupButton").addClass("active");
-	jQuery("#markuppanel").show('slide');
+	jQuery("#markuppanel").show();
 
 	// Check if being on moving mode --> switch to drawing mode
 	if (document.getElementById("rb_Moving").checked) {

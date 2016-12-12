@@ -201,7 +201,6 @@ annotools.prototype.getMultiAnnot = function (viewer) {
     var selalgos = jQuery('#tree').fancytree('getTree').getSelectedNodes()
     // console.log(selalgos)
     for (i = 0; i < selalgos.length; i++) {
-      //console.log(selalgos[i])
       algorithms.push(selalgos[i].refKey)
     // opa["Val" + (i + 1).toString()] = selalgos[i].refKey
     }
@@ -857,6 +856,11 @@ annotools.prototype.addnewAnnot_Array = function (newAnnot_arr) // Add New Annot
   for (i = 0; i< newAnnot_arr.length; i++) {
  	this.saveAnnot_noRefresh(newAnnot_arr[i]);
   }
+  $(document).ajaxStop(function () {
+      // 0 === $.active
+      this.getMultiAnnot();
+      this.displayGeoAnnots();
+  });
   this.getMultiAnnot();
   this.displayGeoAnnots();
 }
