@@ -39,10 +39,10 @@
 }
 
 #markuppanel {
-    width: 190px;
+    width: 200px;
     font-family: Arial, Roboto;
     font-size: 12px;
-    height: 190px;
+    height: 270px;
     top: 60px;
     left: 0;
     position: fixed;

@@ -47,11 +47,15 @@ var annotools = function (options) {
   //this.isLoadedWeight = false;
   //this.loadHeatmapWeight();
   this.btn_saveWeight = document.getElementById('btn_saveHeatmapWeight');
+  this.rb_lymposbig = document.getElementById('LymPosBig');
+  this.rb_lymnegbig = document.getElementById('LymNegBig');
   this.rb_lympos = document.getElementById('LymPos');
   this.rb_lymneg = document.getElementById('LymNeg');
   this.rb_tumpos = document.getElementById('TumorPos');
   this.rb_tumneg = document.getElementById('TumorNeg');
   this.rb_move = document.getElementById('rb_Moving');
+  this.rb_lymposbig.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_lymnegbig.addEventListener('click', this.radiobuttonChange.bind(this), false);
   this.rb_lympos.addEventListener('click', this.radiobuttonChange.bind(this), false);
   this.rb_lymneg.addEventListener('click', this.radiobuttonChange.bind(this), false);
   this.rb_tumpos.addEventListener('click', this.radiobuttonChange.bind(this), false);
@@ -92,6 +96,9 @@ var annotools = function (options) {
 
   cb1.addEventListener('change', this.checkboxChange.bind(this), false);
   cb2.addEventListener('change', this.checkboxChange.bind(this), false);
+
+  // Markup line width
+  this.markupline_width = 1;
 
   // Added code for temp radio box on weights
   var lymse = document.getElementById('LymSe');
@@ -861,6 +868,13 @@ annotools.prototype.addnewAnnot_Array = function (newAnnot_arr) // Add New Annot
       this.getMultiAnnot();
       this.displayGeoAnnots();
   });
+
+  // Sleep a while to have enough time for synchronization between web and database
+  var start = new Date().getTime();
+  var delay = 200;
+  while (new Date().getTime() < start + delay);
+
+
   this.getMultiAnnot();
   this.displayGeoAnnots();
 }
@@ -1232,8 +1246,8 @@ annotools.prototype.saveAnnot = function (annotation) // Save Annotations
     url: 'api/Data/getAnnotSpatial.php',
     data: annotation,
     success: function (res, err) {
-      console.log("response: ")
-      console.log(res)
+      //console.log("response: ")
+      //console.log(res)
       if(res == "unauthorized"){
         alert("Error saving markup! Wrong secret");
       } else {   

@@ -7,6 +7,7 @@ annotools.prototype.drawMarking = function (ctx) {
   this.color_arr = [];
   this.anno_arr = [];
   this.marktype_arr = [];
+  this.markwidth_arr = [];
   this.current_canvasContext = ctx;
   this.mark_type = 'LymPos';
 
@@ -32,17 +33,36 @@ annotools.prototype.drawMarking = function (ctx) {
     ctx.beginPath()
     ctx.moveTo(relativeStartPoint.x, relativeStartPoint.y)
 
+    var drawn_linewidth = 3;
     // Check what radio box is checked
+    if (jQuery("#LymPosBig").is(':checked'))
+    {
+        ctx.strokeStyle = 'red';
+        this.mark_type = 'LymPos';
+        this.markupline_width = 2;
+	drawn_linewidth = 6;
+    }
+
+    if (jQuery("#LymNegBig").is(':checked'))
+    {
+        ctx.strokeStyle = 'blue';
+        this.mark_type = 'LymNeg';
+	this.markupline_width = 2;
+	drawn_linewidth = 6;
+    }
+
     if (jQuery("#LymPos").is(':checked'))
     {
 	ctx.strokeStyle = 'red';
 	this.mark_type = 'LymPos';
+	this.markupline_width = 1;
     }
 
     if (jQuery("#LymNeg").is(':checked'))
     {
         ctx.strokeStyle = 'blue';
 	this.mark_type = 'LymNeg';
+	this.markupline_width = 1;
     }
 
     if (jQuery("#TumorPos").is(':checked'))
@@ -61,7 +81,7 @@ annotools.prototype.drawMarking = function (ctx) {
     this.color_arr.push(ctx.strokeStyle);
     //ctx.strokeStyle = this.color
     console.log(this.color);
-    ctx.lineWidth = 3.0;
+    ctx.lineWidth = drawn_linewidth;
     ctx.stroke()
   }.bind(this))
 
@@ -144,6 +164,7 @@ annotools.prototype.drawMarking = function (ctx) {
     //this.promptForAnnotation(geojsonAnnot, 'new', this, ctx)
     this.anno_arr.push(geojsonAnnot);
     this.marktype_arr.push(this.mark_type);
+    this.markwidth_arr.push(this.markupline_width);
     //this.saveMarking(geojsonAnnot, this.mark_type);
 
     /* Change button back to inactive*/
@@ -159,6 +180,7 @@ annotools.prototype.breakAndConvertToGeo = function ()
 	// Refresh this.anno_arr
 	this.anno_arr = [];
 	this.marktype_broken_arr = [];
+	this.markwidth_broken_arr = [];
 	for (i = 0; i< this.rawAnnotArray.length; i++)
 	{
 		rawAnnot = this.rawAnnotArray[i];
@@ -190,6 +212,7 @@ annotools.prototype.breakAndConvertToGeo = function ()
 			geojsonAnnot.object_type = 'marking';
 			this.anno_arr.push(geojsonAnnot);
 			this.marktype_broken_arr.push(this.marktype_arr[i]);
+			this.markwidth_broken_arr.push(this.markwidth_arr[i]);
 		}
 	}
 }
@@ -206,11 +229,12 @@ annotools.prototype.saveMarking = function (newAnnot, mark_type) {
     this.addnewAnnot(newAnnot);
 }
 
-annotools.prototype.saveMarking_arr = function (newAnnot_arr, mark_type_arr) {
+annotools.prototype.saveMarking_arr = function (newAnnot_arr, mark_type_arr, mark_width_arr) {
     for (iAnn = 0; iAnn < newAnnot_arr.length; iAnn++) {
 	var val = {
             'secret': 'mark1',
             'mark_type': mark_type_arr[iAnn],
+	    'mark_width': mark_width_arr[iAnn],
             'username': this.username
 	}
 	newAnnot_arr[iAnn].properties.annotations = val;
@@ -228,7 +252,7 @@ annotools.prototype.markSave = function (notification, isSetNormalMode) {
 	this.saveMarking(this.anno_arr[i], this.marktype_broken_arr[i]);
     }
     */
-    this.saveMarking_arr(this.anno_arr, this.marktype_broken_arr);
+    this.saveMarking_arr(this.anno_arr, this.marktype_broken_arr, this.markwidth_broken_arr);
     if (notification == true) {
 	alert("Saved markup");
     }
@@ -265,6 +289,7 @@ annotools.prototype.undoStroke = function () {
     this.anno_arr.pop();
     this.rawAnnotArray.pop();
     this.marktype_arr.pop();
+    this.markwidth_arr.pop();
     console.log(this.color_arr);
     this.reDrawCanvas();
 }
@@ -330,8 +355,8 @@ annotools.prototype.radiobuttonChange = function(event) {
 
 
 annotools.prototype.break_drawings = function(nativepoints) {
-    patch_size = 0.001;
-    max_n_point = 4;
+    patch_size = 0.0004;
+    max_n_point = 6;
     coordinate_set = [];
     nativeX_set = [];
     nativeY_set = [];
@@ -413,7 +438,7 @@ annotools.prototype.separate_line = function(coor_list) {
 
 annotools.prototype.calculateIntersect = function(high_res) {
     var marking_sample_rate = 1;
-    var center_dis = 1.25;
+    var center_dis = 1.0;
     var annotations = this.annotations;
 
     var labels = [];
@@ -427,8 +452,10 @@ annotools.prototype.calculateIntersect = function(high_res) {
     }
 
     // get heatmap patch centers
-    hps_small = 1.0;
-    hps_big = 0.0;
+    hpx_small = 1.0;
+    hpy_small = 1.0;
+    hpx_big = 0.0;
+    hpy_big = 0.0;
     for (var i = 0; i < annotations.length; i++) {
         var annotation = annotations[i];
         labels.push(0);
@@ -438,31 +465,38 @@ annotools.prototype.calculateIntersect = function(high_res) {
             id.push(i);
             cx.push((nativepoints[0][0] + nativepoints[2][0])/2.0);
             cy.push((nativepoints[0][1] + nativepoints[2][1])/2.0);
-            hps = (Math.abs(nativepoints[0][0] - nativepoints[1][0]) + Math.abs(nativepoints[0][1] - nativepoints[1][1])) / 2.0;
-            if (hps < hps_small) {
-                hps_small = hps;
-            }
-            if (hps > hps_big) {
-                hps_big = hps;
-            }
+            hpx = Math.abs(nativepoints[0][0] - nativepoints[2][0]) / 2.0;
+            hpy = Math.abs(nativepoints[0][1] - nativepoints[2][1]) / 2.0;
+            if (hpx < hpx_small)
+                hpx_small = hpx;
+            if (hpx > hpx_big)
+                hpx_big = hpx;
+            if (hpy < hpy_small)
+                hpy_small = hpy;
+            if (hpy > hpy_big)
+                hpy_big = hpy;
         }
     }
 
+    disx = 0;
+    disy = 0;
     if (high_res) {
-        var dis = center_dis * hps_small;
+        var disx = center_dis * hpx_small;
+        var disy = center_dis * hpy_small;
     } else {
-        var dis = center_dis * hps_big;
+        var disx = center_dis * hpx_big;
+        var disy = center_dis * hpy_big;
     }
 
-    if (dis == 0) {
-	return;
+    if (disx == 0 || disy == 0) {
+        return;
     }
 
     // traverse markings
     for (var i = 0; i < annotations.length; i++) {
         var annotation = annotations[i];
         //var date = Date.parse(annotation.date.$date);
-	var date = this.getDate(annotation);
+        var date = this.getDate(annotation);
 
         if (annotation.object_type != 'marking') {
             continue;
@@ -481,12 +515,18 @@ annotools.prototype.calculateIntersect = function(high_res) {
         } else {
             continue;
         }
+
+    	if (high_res) {
+		var mark_width = Math.pow(annotation.properties.annotations.mark_width, 2);
+	} else {
+		var mark_width = 1.0;
+	}
         var nativepoints = annotation.geometry.coordinates[0];
         for (var k = 0; k < nativepoints.length; k+=marking_sample_rate) {
             x = nativepoints[k][0];
             y = nativepoints[k][1];
             for (var xy_i = 0; xy_i < cx.length; xy_i++) {
-                if ((Math.abs(cx[xy_i] - x) <= dis) && (Math.abs(cy[xy_i] - y) <= dis)) {
+                if ((Math.abs(cx[xy_i] - x) <= disx*mark_width) && (Math.abs(cy[xy_i] - y) <= disy*mark_width)) {
                     if (date > label_dates[id[xy_i]]) {
                         label_dates[id[xy_i]] = date;
                         labels[id[xy_i]] = label;

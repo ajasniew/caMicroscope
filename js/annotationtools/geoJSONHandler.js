@@ -307,9 +307,21 @@ annotools.prototype.generateSVG = function (annotations) {
 	}
       }
 
-      if (annotation.object_type == 'marking' && (annotation.properties.annotations.mark_type == 'LymPos' || annotation.properties.annotations.mark_type == 'LymNeg'))
-      {
+      //if (annotation.properties.annotations.hasOwnProperty('username')) {
+	   //if (annotation.properties.annotations.username != this.username) {
 		//continue;
+	   //}
+      //}
+
+      if (annotation.object_type == 'marking')
+      {
+		if (annotation.properties.annotations.mark_type == 'LymPos' || annotation.properties.annotations.mark_type == 'LymNeg') {
+			//continue;
+		}
+
+		if (annotation.properties.annotations.username != this.username) {
+			continue;
+		}
       }
 
 
@@ -415,14 +427,16 @@ annotools.prototype.generateSVG = function (annotations) {
 	
 	case 'marking':
 		var line_color = '';
+		var stroke_width = 2.5;
 		switch (annotation.properties.annotations.mark_type)
 		{
-			case 'LymPos': line_color = 'red'; break;
-			case 'LymNeg': line_color = 'blue'; break;
+			case 'LymPos': line_color = 'red'; stroke_width = 2.5*annotation.properties.annotations.mark_width; break;
+			case 'LymNeg': line_color = 'blue'; stroke_width = 2.5*annotation.properties.annotations.mark_width; break;
 			case 'TumorPos': line_color = 'orange'; break;
 			case 'TumorNeg': line_color = 'lime'; break;
 		}
-		svgHtml += '" style="fill:transparent; stroke:'+line_color+ '; stroke-width:2.5"/>'
+		//svgHtml += '" style="fill:transparent; stroke:'+line_color+ '; stroke-width:2.5"/>'
+		svgHtml += '" style="fill:transparent; stroke:'+line_color+ '; stroke-width:' + stroke_width + '"/>';
 		break;
 	default:
 		svgHtml += '" style="fill:transparent; stroke:'+color+ '; stroke-width:2.5"/>'
