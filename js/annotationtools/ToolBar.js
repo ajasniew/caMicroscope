@@ -98,6 +98,17 @@ function goodalgo (data, status) {
     }
   })
   jQuery('#tree').attr('algotree', true)
+
+  // Load weight
+  console.log(annotool.loadedWeight);
+  if (annotool.loadedWeight == false) {
+      console.log('lalala');
+      annotool.loadHeatmapWeight();
+      annotool.updateHeatVarFromSlideBar();
+      annotool.loadedWeight = true;
+  }
+
+
   annotool.getMultiAnnot()
 }
 
@@ -285,10 +296,10 @@ ToolBar.prototype.createButtons = function () {
 	}
 	else
 	{
-		if (this.annotools.loadedWeight == false) {
-			this.annotools.updateHeatVarFromSlideBar();
-			this.annotools.loadedWeight = true;
-		}
+		//if (this.annotools.loadedWeight == false) {
+			//this.annotools.updateHeatVarFromSlideBar();
+			//this.annotools.loadedWeight = true;
+		//}
 		console.log(this.annotools.heat_weight);
 		jQuery('#weightpanel').show();
 	}

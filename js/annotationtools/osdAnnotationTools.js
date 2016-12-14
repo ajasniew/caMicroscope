@@ -45,7 +45,7 @@ var annotools = function (options) {
   //this.heatmapColor = ['#bd0026','#fd8d3c','#fecc5c','#feedde'];
   this.marking_choice = 'LymPos';
   //this.isLoadedWeight = false;
-  //this.loadHeatmapWeight();
+  this.loadHeatmapWeight();
   this.btn_saveWeight = document.getElementById('btn_saveHeatmapWeight');
   this.rb_lymposbig = document.getElementById('LymPosBig');
   this.rb_lymnegbig = document.getElementById('LymNegBig');
@@ -75,7 +75,7 @@ var annotools = function (options) {
   this.cb_checked = [false, false];
   this.heat_weight = [0.5, 0.5];
   this.loadedWeight = false;
-  this.loadHeatmapWeight();
+  //this.loadHeatmapWeight();
   bar_var1 = document.getElementById('bar1');
   bar_var2 = document.getElementById('bar2');
   slide_var1 = document.getElementById('slide1');
@@ -3187,6 +3187,13 @@ annotools.prototype.loadHeatmapWeight = function()
 	     }
            }
         });
+
+	// Wait for the load weight transfering data
+	var start = new Date().getTime();
+  	var delay = 200;
+  	while (new Date().getTime() < start + delay);
+	console.log(document.getElementById('slide1').style.width);
+	self.getMultiAnnot();
 }
 
 annotools.prototype.updateHeatVarFromSlideBar = function()
