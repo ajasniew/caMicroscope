@@ -3060,6 +3060,11 @@ annotools.prototype.promptForDownload = function(newAnnot, mode, annotools, ctx)
 
 annotools.prototype.barMouseDown = function(event)
 {
+	if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+        {
+                return;
+        }
+
 	console.log('bar_mousedown');
 	console.log(bar_click);
 	console.log(event.target.id);
@@ -3081,6 +3086,11 @@ annotools.prototype.barMouseDown = function(event)
 
 annotools.prototype.barMouseUp = function(event)
 {
+	if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+        {
+                return;
+        }
+
 	var self = this;
         //console.log('bar_mouseup');
 	if (bar_click == 0)
@@ -3098,6 +3108,11 @@ annotools.prototype.barMouseUp = function(event)
 
 annotools.prototype.barMouseSlide = function(event)
 {
+	if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+	{
+		return;
+	}
+
 	if (bar_click != 0)
 	{
         	//console.log('bar_mouseslide');
@@ -3150,6 +3165,7 @@ annotools.prototype.saveHeatmapWeight = function(event)
 	       }
 	       else
 	       {
+		    document.getElementById('div_weight_locked').innerHTML = 'Locked';
 		    alert('Saved heatmap weights');
 	       }
 	   }
@@ -3169,6 +3185,7 @@ annotools.prototype.loadHeatmapWeight = function()
            success: function(data) {
 	     var sl1 = document.getElementById('slide1');
 	     var sl2 = document.getElementById('slide2');
+	     var div_lock = document.getElementById('div_weight_locked');
 		console.log(data);
 	     if (!data.startsWith('NaN')) { 
 	       parts = data.split('\n');
@@ -3179,11 +3196,13 @@ annotools.prototype.loadHeatmapWeight = function()
 	       var nec = (parseFloat(parts[1]) * 100).toString() + '%';
 	       sl1.style.width = lym;
 	       sl2.style.width = nec;
+	       div_lock.innerHTML = "Locked";
 	     } else
 	     {
 		console.log('go else');
 		sl1.style.width = '50%';
 		sl2.style.width = '50%';
+		div_lock.innerHTML = "Free";
 	     }
            }
         });
@@ -3193,6 +3212,7 @@ annotools.prototype.loadHeatmapWeight = function()
   	var delay = 200;
   	while (new Date().getTime() < start + delay);
 	console.log(document.getElementById('slide1').style.width);
+	console.log(document.getElementById('div_weight_locked').innerHTML);
 	self.getMultiAnnot();
 }
 
