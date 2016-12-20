@@ -47,6 +47,7 @@ var annotools = function (options) {
   //this.isLoadedWeight = false;
   this.loadHeatmapWeight();
   this.btn_saveWeight = document.getElementById('btn_saveHeatmapWeight');
+  this.btn_saveweight_help = document.getElementById('btn_heatmapweight_help');
   this.rb_lymposbig = document.getElementById('LymPosBig');
   this.rb_lymnegbig = document.getElementById('LymNegBig');
   this.rb_lympos = document.getElementById('LymPos');
@@ -63,11 +64,67 @@ var annotools = function (options) {
   this.rb_move.addEventListener('click', this.radiobuttonChange.bind(this), false);
 
   this.btn_saveWeight.addEventListener('click', this.saveHeatmapWeight.bind(this), false);
+  this.btn_saveweight_help.addEventListener('click', function(){alert('\
+This panel allows you to adjust the automatic lymphocyte prediction results for this slide, with the options described below.\n\n\
+Lymphocyte Sensitivity bar:\n       Ddjust the sensitivity of lymphocyte prediction.\n\
+       Choose a higher volume for more predicted lymphocyte regions\n\n\
+Necrosis Specificity bar:\n       Ddjust the specificity of necrosis prediction.\n\
+       Choose a higher volume for more predicted lymphocyte regions\n\n\
+Lymphocyte Prediction box:\n       Show lymphocyte prediction without necrosis filtering.\n\n\
+Necrosis Prediction box:\n       Show necrosis prediction.\n\n\
+Lym Prediction with Nec Filtering box:\n       Show lymphocyte prediction with necrosis filtering (recommended).\n\n\
+');}, false);
+
 
   this.btn_savemark_var = document.getElementById('btn_savemark');
   this.btn_savemark_var.addEventListener('click', this.markSaveClick.bind(this), false);
   this.btn_undomark_var = document.getElementById('btn_undomark');
+  this.btn_undomark_help_var = document.getElementById('btn_mark_help');
   this.btn_undomark_var.addEventListener('click', this.undoStroke.bind(this), false);
+  this.btn_undomark_help_var.addEventListener('click', function(){alert('\
+This panel provides tools to manually mark lymphocyte/non-lymphocyte, tumor/non-tumor regions.\n\n\
+If you are unsatisfied with the lymphocyte prediction result, please polish it using options described below:\n\
+   LymPos (draw thin line):\n\
+       Draw lines across lymphocyte squares.\n\
+       After saved, squares crossed by the line\n\
+       will be marked as lymphocyte squares.\n\
+   LymNeg (draw thin line):\n\
+       Draw lines across non-lymphocyte squares.\n\
+       After saved, squares crossed by the line\n\
+       will be marked as non-lymphocyte squares.\n\
+   LymPos (draw thick line):\n\
+       Draw lines across lymphocyte squares.\n\
+       After saved, squares close to the line\n\
+       will be marked as lymphocyte squares.\n\
+   LymNeg (draw thick line):\n\
+       Draw lines across non-lymphocyte squares.\n\
+       After saved, squares close to the line\n\
+       will be marked as non-lymphocyte squares.\n\n\
+Please indicate tumor regions using options described below:\n\
+   TumorPos (draw polygon):\n\
+       Draw curves around tumor regions of this slide.\n\
+       Regions not included will be considered as non-tumor\n\
+       regions by default.\n\
+   TumorNeg (draw polygon):\n\
+       Draw curves around non-tumor regions of this slide.\n\
+       Note that you can draw curves around tumor regions\n\
+       using the TumorPos option, and regions not included in\n\
+       the TumorPos region will be considered as non-tumor by\n\
+       default. Therefore you do not have to use this option.\n\
+       Nevertheless, you can use this option to overwrite\n\
+       regions you previously masked as tumor regions to\n\
+       non-tumor regions.\n\n\
+To save/cancel your work, use the buttons described below:\n\
+   Save then Move Around:\n\
+       Save all markings and switch to the navigation\n\
+       mode (Zoom in/out, move the slide around).\n\
+   Save:\n\
+       Save all markings, and continue to mark.\n\
+   Cancel:\n\
+       Cancel the most recent, unsaved marking.\n\
+       To change saved markings, you can simply\n\
+       overwrite them by drawing new markings.\
+');}, false);
 
   this.heatmap_opacity = 0.4;
   this.heatmapColor = ['#feedde','#fecc5c','#fd8d3c','#bd0026', '#33b5ff'];

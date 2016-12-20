@@ -496,7 +496,7 @@ annotools.prototype.calculateIntersect = function(high_res) {
     for (var i = 0; i < annotations.length; i++) {
         var annotation = annotations[i];
         //var date = Date.parse(annotation.date.$date);
-        var date = this.getDate(annotation);
+        //var date = this.getDate(annotation);
 
         if (annotation.object_type != 'marking') {
             continue;
@@ -516,6 +516,8 @@ annotools.prototype.calculateIntersect = function(high_res) {
             continue;
         }
 
+	var date = this.getDate(annotation);
+	
     	if (high_res) {
 		var mark_width = Math.pow(annotation.properties.annotations.mark_width, 2);
 	} else {
@@ -547,6 +549,7 @@ annotools.prototype.getDate = function(annotation)
 	}
 	else
 	{
+		console.log(typeof annotation.date.$date);
 		if (typeof annotation.date.$date != "undefined")
 		{
 			return Date.parse(annotation.date.$date);
