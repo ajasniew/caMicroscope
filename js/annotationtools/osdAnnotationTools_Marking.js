@@ -435,6 +435,72 @@ annotools.prototype.separate_line = function(coor_list) {
     }
 }
 
+// smooth the high resolution heatmap
+// smooth_width: integer. the side-length of the smoothing window is 2*smooth_width+1
+// smooth_factor: float. higher smooth_factor --> more smoothness
+annotools.prototype.heatmap_smoothing = function(smooth_width, smooth_factor) {
+    if (smooth_width == 0 || smooth_factor < 0.01)
+        return;
+
+    var annotations = this.annotations;
+
+    // get heatmap patch size
+    px = 1.0;
+    py = 1.0;
+    for (var i = 0; i < annotations.length; i++) {
+        var annotation = annotations[i];
+        if (annotation.object_type == 'heatmap_multiple') {
+            var nativepoints = annotation.geometry.coordinates[0];
+            this_px = Math.abs(nativepoints[0][0] - nativepoints[2][0]);
+            this_py = Math.abs(nativepoints[0][1] - nativepoints[2][1]);
+            if (this_px < px)
+                px = this_px;
+            if (this_py < py)
+                py = this_py;
+        }
+    }
+
+    // put heatmap to a dictionary
+    var dict = {};
+    for (var i = 0; i < annotations.length; i++) {
+        var annotation = annotations[i];
+        if (annotation.object_type == 'heatmap_multiple') {
+            var nativepoints = annotation.geometry.coordinates[0];
+            this_px = Math.abs(nativepoints[0][0] - nativepoints[2][0]);
+            if (Math.abs(this_px-px) < 0.0000001) {
+                x = Math.round(nativepoints[0][0] / px);
+                y = Math.round(nativepoints[0][1] / py);
+                dict[x.toString()+'-'+y.toString()] = annotation.properties.multiheat_param.metric_array[0];
+            }
+        }
+    }
+
+    // heatmap smoothing
+    for (var i = 0; i < annotations.length; i++) {
+        var annotation = annotations[i];
+        if (annotation.object_type == 'heatmap_multiple') {
+            var nativepoints = annotation.geometry.coordinates[0];
+            this_px = Math.abs(nativepoints[0][0] - nativepoints[2][0]);
+            if (Math.abs(this_px-px) < 0.0000001) {
+                x = Math.round(nativepoints[0][0] / px);
+                y = Math.round(nativepoints[0][1] / py);
+                score_sum = 0;
+                weight_sum = 0;
+                for (xi = x-smooth_width; xi <= x+smooth_width; xi++) {
+                    for (yi = y-smooth_width; yi <= y+smooth_width; yi++) {
+                        key = xi.toString()+'-'+yi.toString();
+                        if (key in dict) {
+                            weight = 1.0 / (Math.abs(xi-x) + Math.abs(yi-y) + smooth_factor);
+                            score_sum += dict[key] * weight;
+                            weight_sum += weight;
+                        }
+                    }
+                }
+                annotation.properties.multiheat_param.metric_array[0] = score_sum / weight_sum;
+            }
+        }
+    }
+}
 
 annotools.prototype.calculateIntersect = function(high_res) {
     var marking_sample_rate = 1;

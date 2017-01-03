@@ -129,17 +129,20 @@ To save/cancel your work, use the buttons described below:\n\
   this.heatmap_opacity = 0.4;
   this.heatmapColor = ['#feedde','#fecc5c','#fd8d3c','#bd0026', '#33b5ff'];
   this.multipleHeatmapColor = [];
-  this.cb_checked = [false, false];
-  this.heat_weight = [0.5, 0.5];
+  this.cb_checked = [false, false, false];
+  this.heat_weight = [0.5, 0.5, 0.0];
   this.loadedWeight = false;
   //this.loadHeatmapWeight();
   bar_var1 = document.getElementById('bar1');
   bar_var2 = document.getElementById('bar2');
+  bar_var3 = document.getElementById('bar3');
   slide_var1 = document.getElementById('slide1');
   slide_var2 = document.getElementById('slide2');
+  slide_var3 = document.getElementById('slide3');
   cb1 = document.getElementById('cb1');
   cb2 = document.getElementById('cb2');
-  bar_click = 0;	// 0: no bar is clicked, 1: bar_1 is clicked, 2: bar_2 is clicked
+  cb3 = document.getElementById('cb3');
+  bar_click = 0;	// 0: no bar is clicked, 1: bar_1 is clicked, 2: bar_2 is clicked, 3: bar_3 is clicked
 
   bar_var1.addEventListener('mousedown', this.barMouseDown, false);
   bar_var1.addEventListener('mouseup', this.barMouseUp.bind(this), false);
@@ -151,8 +154,14 @@ To save/cancel your work, use the buttons described below:\n\
   bar_var2.addEventListener('mousemove', this.barMouseSlide, false);
   bar_var2.addEventListener('mouseleave', this.barMouseUp.bind(this), false);
 
+  bar_var3.addEventListener('mousedown', this.barMouseDown, false);
+  bar_var3.addEventListener('mouseup', this.barMouseUp.bind(this), false);
+  bar_var3.addEventListener('mousemove', this.barMouseSlide, false);
+  bar_var3.addEventListener('mouseleave', this.barMouseUp.bind(this), false);
+
   cb1.addEventListener('change', this.checkboxChange.bind(this), false);
   cb2.addEventListener('change', this.checkboxChange.bind(this), false);
+  cb3.addEventListener('change', this.checkboxChange.bind(this), false);
 
   // Markup line width
   this.markupline_width = 1;
@@ -166,6 +175,7 @@ To save/cancel your work, use the buttons described below:\n\
   bothse.addEventListener('change', this.lymnecWeightChange.bind(this), false);
   cb1.style.visibility = "hidden";
   cb2.style.visibility = "hidden";
+  cb3.style.visibility = "hidden";
 
   /*
    * OpenSeaDragon events
@@ -3133,11 +3143,17 @@ annotools.prototype.barMouseDown = function(event)
 		//slide_var1.style.width = (set_perc * 100) + '%';
 		selected_slide = slide_var1;
 	}
-	else
+	else if (event.target.id == 'slide2' || event.target.id == 'bar2')
 	{
 		bar_click = 2;
 		selected_slide = slide_var2;
 	}
+	else
+	{
+		bar_click = 3;
+		selected_slide = slide_var3;
+	}
+
 	selected_slide.style.width = (set_perc * 100) + '%';
 }
 
@@ -3160,6 +3176,7 @@ annotools.prototype.barMouseUp = function(event)
 	bar_click = 0;
 	this.cb_checked[0] = document.getElementById('cb1').checked;
 	this.cb_checked[1] = document.getElementById('cb2').checked;
+	this.cb_checked[2] = document.getElementById('cb3').checked;
 	self.getMultiAnnot();
 }
 
@@ -3178,9 +3195,13 @@ annotools.prototype.barMouseSlide = function(event)
 		{
 			slide_var1.style.width = (set_perc * 100) + '%';
 		}
-		else
+		else if (bar_click == 2)
 		{
 			slide_var2.style.width = (set_perc * 100) + '%';
+		}
+		else
+		{
+			slide_var3.style.width = (set_perc * 100) + '%';
 		}
 	}
 }
@@ -3211,7 +3232,7 @@ annotools.prototype.saveHeatmapWeight = function(event)
 	$.ajax({
            type: "POST",
            url: "php/save_weight.php",
-           data: {iid: self.iid, lymweight: this.heat_weight[0], necweight: this.heat_weight[1], user: this.username},
+           data: {iid: self.iid, lymweight: this.heat_weight[0], necweight: this.heat_weight[1], smoothness: this.heat_weight[2], user: this.username},
            dataType: "text",
            success: function(data) {
                console.log(data);
@@ -3242,6 +3263,7 @@ annotools.prototype.loadHeatmapWeight = function()
            success: function(data) {
 	     var sl1 = document.getElementById('slide1');
 	     var sl2 = document.getElementById('slide2');
+	     var sl3 = document.getElementById('slide3');
 	     var div_lock = document.getElementById('div_weight_locked');
 		console.log(data);
 	     if (!data.startsWith('NaN')) { 
@@ -3249,16 +3271,21 @@ annotools.prototype.loadHeatmapWeight = function()
 	       //arr = [parseFloat(parts[0]), parseFloat(parts[1])];
 	       //var sl1 = document.getElementById('slide1');
 	       //var sl2 = document.getElementById('slide2');
+	       //var sl3 = document.getElementById('slide3');
 	       var lym = (parseFloat(parts[0]) * 100).toString() + '%';
 	       var nec = (parseFloat(parts[1]) * 100).toString() + '%';
+	       var smh = (parseFloat(parts[2]) * 100).toString() + '%';
+		console.log(smh);
 	       sl1.style.width = lym;
 	       sl2.style.width = nec;
+	       sl3.style.width = smh;
 	       div_lock.innerHTML = "Locked";
 	     } else
 	     {
 		console.log('go else');
 		sl1.style.width = '50%';
 		sl2.style.width = '50%';
+		sl3.style.width = '0%';
 		div_lock.innerHTML = "Free";
 	     }
            }
@@ -3277,8 +3304,10 @@ annotools.prototype.updateHeatVarFromSlideBar = function()
 {
 	var sl1 = document.getElementById('slide1');
 	var sl2 = document.getElementById('slide2');
+	var sl3 = document.getElementById('slide3');
 	var lym = parseFloat(sl1.style.width.substring(0, sl1.style.width.length)) / 100;
 	var nec = parseFloat(sl2.style.width.substring(0, sl2.style.width.length)) / 100;
-	this.heat_weight = [lym, nec];
+	var smh = parseFloat(sl3.style.width.substring(0, sl3.style.width.length)) / 100;
+	this.heat_weight = [lym, nec, smh];
 }
 

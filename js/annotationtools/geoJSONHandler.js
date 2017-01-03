@@ -293,6 +293,9 @@ annotools.prototype.generateSVG = function (annotations) {
 	highres = false;
     }
 
+    if (highres) {
+        this.heatmap_smoothing(1, 2 * Math.pow(this.heat_weight[2], 2));
+    }
     var intersect_label = this.calculateIntersect(highres);
 
     for (var i = 0; i < annotations.length; i++) {
