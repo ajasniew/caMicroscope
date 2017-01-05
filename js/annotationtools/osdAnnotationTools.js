@@ -3260,14 +3260,13 @@ annotools.prototype.loadHeatmapWeight = function()
 	       //var sl3 = document.getElementById('slide3');
 	       var lym = (parseFloat(parts[0]) * 100).toString() + '%';
 	       if (lym == 'NaN%')
-	           lym = 0.0;
+	           lym = '50%';
 	       var nec = (parseFloat(parts[1]) * 100).toString() + '%';
 	       if (nec == 'NaN%')
-	           nec = 0.0;
+	           nec = '50%';
 	       var smh = (parseFloat(parts[2]) * 100).toString() + '%';
 	       if (smh == 'NaN%')
-	           smh = 0.0;
-	       console.log(smh);
+	           smh = '0%';
 	       sl1.style.width = lym;
 	       sl2.style.width = nec;
 	       sl3.style.width = smh;

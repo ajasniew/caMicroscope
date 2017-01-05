@@ -343,15 +343,13 @@ var AnnotoolsOpenSeadragonHandler = function(viewer, options){
       if (this.annotool.mode == 'free_markup')
           this.annotool.markSaveClick(null);
 
-      if (evt.wheelDelta < 0)
+      if (evt.wheelDelta > 0)
           this.viewer.viewport.zoomTo(this.viewer.viewport.getZoom()*1.2);
       else
           this.viewer.viewport.zoomTo(this.viewer.viewport.getZoom()/1.2);
    };
 
    AnnotoolsOpenSeadragonHandler.prototype.handleKeyPress= function(evt) {
-     console.log(evt);
-
      delta = 48.0 / this.viewer.viewport.getZoom() * 0.005;
      switch (evt.key) {
         case "a":
@@ -394,25 +392,85 @@ var AnnotoolsOpenSeadragonHandler = function(viewer, options){
                   this.viewer.viewport.panTo(pt, false);
 		  break;
  
-	case "q": annotool.toggleMarkups();
+        case " ": annotool.toggleMarkups();
 		  break;
 
-	case "1": document.getElementById('LymPos').checked = true;
-		  break;
-
-        case "2": document.getElementById('LymNeg').checked = true;
+        case "1": 
+                  if (annotool.marking_choice == 'rb_Moving') {
+                      document.getElementById('LymPos').checked = true;
+                      annotool.drawMarkups();
+                      jQuery("canvas").css("cursor", "crosshair");
+                      jQuery("#drawRectangleButton").removeClass("active");
+                      jQuery("#drawDotButton").removeClass("active");
+                      jQuery("#drawFreelineButton").removeClass("active");
+                      annotool.marking_choice = 'LymPos';
+                  } else
+                      document.getElementById('LymPos').checked = true;
                   break;
 
-        case "3": document.getElementById('LymPosBig').checked = true;
+        case "2":
+                  if (annotool.marking_choice == 'rb_Moving') {
+                      document.getElementById('LymNeg').checked = true;
+                      annotool.drawMarkups();
+                      jQuery("canvas").css("cursor", "crosshair");
+                      jQuery("#drawRectangleButton").removeClass("active");
+                      jQuery("#drawDotButton").removeClass("active");
+                      jQuery("#drawFreelineButton").removeClass("active");
+                      annotool.marking_choice = 'LymNeg';
+                  } else
+                      document.getElementById('LymNeg').checked = true;
                   break;
 
-        case "4": document.getElementById('LymNegBig').checked = true;
+        case "3":
+                  if (annotool.marking_choice == 'rb_Moving') {
+                      document.getElementById('LymPosBig').checked = true;
+                      annotool.drawMarkups();
+                      jQuery("canvas").css("cursor", "crosshair");
+                      jQuery("#drawRectangleButton").removeClass("active");
+                      jQuery("#drawDotButton").removeClass("active");
+                      jQuery("#drawFreelineButton").removeClass("active");
+                      annotool.marking_choice = 'LymPosBig';
+                  } else
+                      document.getElementById('LymPosBig').checked = true;
                   break;
 
-        case "5": document.getElementById('TumorPos').checked = true;
+        case "4":
+                  if (annotool.marking_choice == 'rb_Moving') {
+                      document.getElementById('LymNegBig').checked = true;
+                      annotool.drawMarkups();
+                      jQuery("canvas").css("cursor", "crosshair");
+                      jQuery("#drawRectangleButton").removeClass("active");
+                      jQuery("#drawDotButton").removeClass("active");
+                      jQuery("#drawFreelineButton").removeClass("active");
+                      annotool.marking_choice = 'LymNegBig';
+                  } else
+                      document.getElementById('LymNegBig').checked = true;
                   break;
 
-        case "6": document.getElementById('TumorNeg').checked = true;
+        case "5":
+                  if (annotool.marking_choice == 'rb_Moving') {
+                      document.getElementById('TumorPos').checked = true;
+                      annotool.drawMarkups();
+                      jQuery("canvas").css("cursor", "crosshair");
+                      jQuery("#drawRectangleButton").removeClass("active");
+                      jQuery("#drawDotButton").removeClass("active");
+                      jQuery("#drawFreelineButton").removeClass("active");
+                      annotool.marking_choice = 'TumorPos';
+                  } else
+                      document.getElementById('TumorPos').checked = true;
+                  break;
+
+        case "6":
+                  if (annotool.marking_choice == 'rb_Moving') {
+                      document.getElementById('TumorNeg').checked = true;
+                      annotool.drawMarkups();
+                      jQuery("canvas").css("cursor", "crosshair");
+                      jQuery("#drawRectangleButton").removeClass("active");
+                      jQuery("#drawDotButton").removeClass("active");
+                      jQuery("#drawFreelineButton").removeClass("active");
+                      annotool.marking_choice = 'TumorNeg';
+                  } else
+                      document.getElementById('TumorNeg').checked = true;
                   break;
 
         case "7": document.getElementById('rb_Moving').checked = true;
@@ -420,9 +478,5 @@ var AnnotoolsOpenSeadragonHandler = function(viewer, options){
                   annotool.radiobuttonChange(mock_evt);
                   break;
      }
-     //var pt = this.viewer.viewport.getCenter(true).plus(new OpenSeadragon.Point(delta_x, delta_y));
-     //console.log(this.viewer.viewport.getZoom());
-     //this.viewer.viewport.panTo(pt, false);
-     //console.log(evt);
    };
 

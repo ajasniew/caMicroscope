@@ -281,50 +281,40 @@ annotools.prototype.generateSVG = function (annotations) {
 
     highres = false;
     for (var i = 0; i < annotations.length; i++) {
-	if (annotations[i].footprint < 100000)
-	{
-		highres = true;
-		break;
-	}
+        if (annotations[i].footprint < 100000)
+        {
+            highres = true;
+            break;
+        }
     }
 
     if (this.imagingHelper._viewportWidth * this.imagingHelper._viewportHeight > 0.06)
-    {
-	highres = false;
+        highres = false;
+
+    smth_or_not = highres;
+    if (smth_or_not) {
+        smoothed_anno = this.heatmap_smoothing(1, 0.01 + 2 * Math.pow(this.heat_weight[2], 2));
     }
 
-    if (highres) {
-        this.heatmap_smoothing(1, 2 * Math.pow(this.heat_weight[2], 2));
-    }
     var intersect_label = this.calculateIntersect(highres);
 
     for (var i = 0; i < annotations.length; i++) {
+      if (smth_or_not)
+        var smoothed = smoothed_anno[i]
       var annotation = annotations[i]
-	//console.log(annotation.footprint);
       if (((highres == false) && (annotation.footprint <= 100000)) || ((highres == true) && (annotation.footprint > 100000)))
-      {
-	//console.log('in break');
-	if (annotation.object_type == 'heatmap_multiple')
-	{
-		continue;
-	}
-      }
-
-      //if (annotation.properties.annotations.hasOwnProperty('username')) {
-	   //if (annotation.properties.annotations.username != this.username) {
-		//continue;
-	   //}
-      //}
+        if (annotation.object_type == 'heatmap_multiple')
+            continue;
 
       if (annotation.object_type == 'marking')
       {
-		if (annotation.properties.annotations.mark_type == 'LymPos' || annotation.properties.annotations.mark_type == 'LymNeg') {
-			//continue;
-		}
+        if (annotation.properties.annotations.mark_type == 'LymPos' || annotation.properties.annotations.mark_type == 'LymNeg')
+        {
+            //continue;
+        }
 
-		if (annotation.properties.annotations.username != this.username) {
-			continue;
-		}
+        if (annotation.properties.annotations.username != this.username)
+            continue;
       }
 
 
@@ -371,7 +361,11 @@ annotools.prototype.generateSVG = function (annotations) {
 		svgHtml += '" style="fill:' + heatcolor.toString() + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
 		break;
 	case 'heatmap_multiple':
-		var lym_score = annotation.properties.multiheat_param.metric_array[0];
+        if (smth_or_not) {
+		  var lym_score = smoothed;
+        } else {
+		  var lym_score = annotation.properties.multiheat_param.metric_array[0];
+        }
 		var nec_score = annotation.properties.multiheat_param.metric_array[1];
 		var nec_weight = this.heat_weight[1];
 		var lym_weight = 1-this.heat_weight[0];
@@ -423,8 +417,8 @@ annotools.prototype.generateSVG = function (annotations) {
 			combo = 0;
 		}
 		var heatmapIndex = parseInt(parseInt((combo * 10))/2.5);
-                var heatcolor = this.heatmapColor[heatmapIndex];
-                svgHtml += '" style="fill:' + heatcolor.toString() + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+        var heatcolor = this.heatmapColor[heatmapIndex];
+        svgHtml += '" style="fill:' + heatcolor.toString() + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
 		*/
                 break;
 	

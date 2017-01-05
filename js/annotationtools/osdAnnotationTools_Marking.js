@@ -344,12 +344,9 @@ annotools.prototype.radiobuttonChange = function(event) {
 			console.log('change to drawing mode');
 			this.drawMarkups();
 			jQuery("canvas").css("cursor", "crosshair");
-        		//jQuery("drawFreelineButton").css("opacity", 1);
-        		jQuery("#drawRectangleButton").removeClass("active");
-        		jQuery("#drawDotButton").removeClass("active");     // Dot Tool
-        		jQuery("#drawFreelineButton").removeClass("active");
-        		//jQuery("#freeLineMarkupButton").addClass("active");
-        		//jQuery("#markuppanel").show('slide');
+			jQuery("#drawRectangleButton").removeClass("active");
+			jQuery("#drawDotButton").removeClass("active");     // Dot Tool
+			jQuery("#drawFreelineButton").removeClass("active");
 		}
         }
 	this.marking_choice = event.target.id;
@@ -442,10 +439,8 @@ annotools.prototype.separate_line = function(coor_list) {
 // smooth_width: integer. the side-length of the smoothing window is 2*smooth_width+1
 // smooth_factor: float. higher smooth_factor --> more smoothness
 annotools.prototype.heatmap_smoothing = function(smooth_width, smooth_factor) {
-    if (smooth_width == 0 || smooth_factor < 0.01)
-        return;
-
     var annotations = this.annotations;
+    var smoothed_anno = [];
 
     // get heatmap patch size
     px = 1.0;
@@ -481,10 +476,12 @@ annotools.prototype.heatmap_smoothing = function(smooth_width, smooth_factor) {
     // heatmap smoothing
     for (var i = 0; i < annotations.length; i++) {
         var annotation = annotations[i];
+        smoothed = 0;
         if (annotation.object_type == 'heatmap_multiple') {
             var nativepoints = annotation.geometry.coordinates[0];
             this_px = Math.abs(nativepoints[0][0] - nativepoints[2][0]);
             if (Math.abs(this_px-px) < 0.0000001) {
+                // make sure it's high-res heatmap
                 x = Math.round(nativepoints[0][0] / px);
                 y = Math.round(nativepoints[0][1] / py);
                 score_sum = 0;
@@ -499,10 +496,13 @@ annotools.prototype.heatmap_smoothing = function(smooth_width, smooth_factor) {
                         }
                     }
                 }
-                annotation.properties.multiheat_param.metric_array[0] = score_sum / weight_sum;
+                smoothed = score_sum / weight_sum;
             }
         }
+        smoothed_anno.push(smoothed);
     }
+
+    return smoothed_anno;
 }
 
 annotools.prototype.calculateIntersect = function(high_res) {
