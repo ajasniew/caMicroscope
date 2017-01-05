@@ -243,18 +243,21 @@ annotools.prototype.saveMarking_arr = function (newAnnot_arr, mark_type_arr, mar
 }
 
 annotools.prototype.markSave = function (notification, isSetNormalMode) {
-    console.log(this.anno_arr.length);
+    console.log(this.rawAnnotArray.length);
+    if (this.rawAnnotArray.length == 0)
+        return;
+
     this.breakAndConvertToGeo();
     /*
     for (i = 0; i< this.anno_arr.length; i++)
     {
-	//this.saveMarking(this.anno_arr[i], this.marktype_arr[i]);
-	this.saveMarking(this.anno_arr[i], this.marktype_broken_arr[i]);
+        //this.saveMarking(this.anno_arr[i], this.marktype_arr[i]);
+        this.saveMarking(this.anno_arr[i], this.marktype_broken_arr[i]);
     }
     */
     this.saveMarking_arr(this.anno_arr, this.marktype_broken_arr, this.markwidth_broken_arr);
     if (notification == true) {
-	alert("Saved markup");
+        alert("Saved markup");
     }
     console.log(this.marktype_arr);
 
@@ -278,7 +281,7 @@ annotools.prototype.markSave = function (notification, isSetNormalMode) {
 }
 
 annotools.prototype.markSaveClick = function (event) {
-        this.markSave(false, false);
+    this.markSave(false, false);
 }
 
 annotools.prototype.undoStroke = function () {

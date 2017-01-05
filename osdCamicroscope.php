@@ -115,7 +115,7 @@
             <button type="button" class="btn_heatmap" id="btn_heatmapweight_help">&#x2753</button>
         </div>
 
-	<div id="markuppanel"> <input type="radio" name="marktype" value="LymPos" checked="checked" id="LymPos" class="radio_markup"> <label for="LymPos" class=radio_markup>LymPos (draw thin line)</label><br><input type="radio" name="marktype" value="LymNeg" id="LymNeg" class="radio_markup"> <label for="LymNeg" class=radio_markup>LymNeg (draw thin line)</label><br><p><p> <input type="radio" name="marktype" value="LymPosBig" id="LymPosBig" class="radio_markup"> <label for="LymPosBig" class=radio_markup>LymPos (draw thick line)</label><br><input type="radio" name="marktype" value="LymNegBig" id="LymNegBig" class="radio_markup"> <label for="LymNegBig" class=radio_markup>LymNeg (draw thick line)</label><br><p><p> <input type="radio" name="marktype" value="TumorPos" id="TumorPos" class="radio_markup"> <label for="TumorPos" class=radio_markup>TumorPos (draw polygon)</label><br><input type="radio" name="marktype" value="TumorNeg" id="TumorNeg" class="radio_markup"> <label for="TumorNeg" class=radio_markup>TumorNeg (draw polygon)</label><br><p><p> <input type="radio" name="marktype" value="Moving" id="rb_Moving" class="radio_markup"> <label for="rb_Moving" class=radio_markup>Save then Move Around</label><br>
+	<div id="markuppanel"> <input type="radio" name="marktype" value="LymPos" checked="checked" id="LymPos" class="radio_markup"> <label for="LymPos" class=radio_markup> (1) LymPos (draw thin line)</label><br><input type="radio" name="marktype" value="LymNeg" id="LymNeg" class="radio_markup"> <label for="LymNeg" class=radio_markup> (2) LymNeg (draw thin line)</label><br><p><p> <input type="radio" name="marktype" value="LymPosBig" id="LymPosBig" class="radio_markup"> <label for="LymPosBig" class=radio_markup> (3) LymPos (draw thick line)</label><br><input type="radio" name="marktype" value="LymNegBig" id="LymNegBig" class="radio_markup"> <label for="LymNegBig" class=radio_markup> (4) LymNeg (draw thick line)</label><br><p><p> <input type="radio" name="marktype" value="TumorPos" id="TumorPos" class="radio_markup"> <label for="TumorPos" class=radio_markup> (5) TumorPos (draw polygon)</label><br><input type="radio" name="marktype" value="TumorNeg" id="TumorNeg" class="radio_markup"> <label for="TumorNeg" class=radio_markup> (6) TumorNeg (draw polygon)</label><br><p><p> <input type="radio" name="marktype" value="Moving" id="rb_Moving" class="radio_markup"> <label for="rb_Moving" class=radio_markup> (7) Save then Navigate</label><br>
 <button type="button" class="btn_mark" id="btn_savemark">Save</button>
 <button type="button" class="btn_mark" id="btn_undomark" >Cancel</button>
 <button type="button" class="btn_mark" id="btn_mark_help">&#x2753</button> </div>
@@ -187,26 +187,26 @@
               barThickness: 2
             });
     //console.log(viewer);
-function isAnnotationActive(){
-    this.isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-    this.isFirefox = typeof InstallTrigger !== 'undefined';
-    this.isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
-    this.isChrome = !!window.chrome;
-    this.annotationActive = !(this.isIE || this.isOpera);
-    return this.annotationActive;
-}
+    function isAnnotationActive(){
+        this.isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+        this.isFirefox = typeof InstallTrigger !== 'undefined';
+        this.isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+        this.isChrome = !!window.chrome;
+        this.annotationActive = !(this.isIE || this.isOpera);
+        return this.annotationActive;
+    }
 
     function addOverlays() {
         var annotationHandler = new AnnotoolsOpenSeadragonHandler(viewer, {});
-	var sessionUsername = <?php echo '"' . $_SESSION['email'] . '"' ?>;
-	//var sessionUsername = 'test@gmail.com';
+        var sessionUsername = <?php echo '"' . $_SESSION['email'] . '"' ?>;
+        //var sessionUsername = 'test@gmail.com';
         annotool= new annotools({
                 canvas:'openseadragon-canvas',
                 iid: tissueId, 
                 viewer: viewer,
                 annotationHandler: annotationHandler,
                 mpp:MPP,
-		username: sessionUsername
+                username: sessionUsername
             });
         //console.log(tissueId);
         var toolBar = new ToolBar('tool', {
@@ -219,6 +219,8 @@ function isAnnotationActive(){
            
         });
         annotool.toolBar = toolBar;
+	annotationHandler.annotool = annotool;
+	annotationHandler.toolbar = toolBar;
         toolBar.createButtons();
         
         /*Pan and zoom to point*/
@@ -227,8 +229,8 @@ function isAnnotationActive(){
         var zoom = <?php echo json_encode($_GET['zoom']); ?> || viewer.viewport.getMaxZoom();
 
         //jQuery("#panel").hide();
-	jQuery("#weightpanel").hide();
-	jQuery("#markuppanel").hide();
+        jQuery("#weightpanel").hide();
+        jQuery("#markuppanel").hide();
         if(bound_x && bound_y){
             var ipt = new OpenSeadragon.Point(+bound_x, +bound_y);
             var vpt = viewer.viewport.imageToViewportCoordinates(ipt);
@@ -239,7 +241,7 @@ function isAnnotationActive(){
         }
     }
 
-      if (!String.prototype.format) {
+    if (!String.prototype.format) {
         String.prototype.format = function() {
             var args = arguments;
             return this.replace(/{(\d+)}/g, function(match, number) { 
@@ -249,7 +251,7 @@ function isAnnotationActive(){
             ;
             });
         };
-      }
+    }
 
     /*Zoom to location*/
     /*

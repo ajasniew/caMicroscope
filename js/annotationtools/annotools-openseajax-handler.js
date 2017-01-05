@@ -220,7 +220,7 @@ var AnnotoolsOpenSeadragonHandler = function(viewer, options){
     AnnotoolsOpenSeadragonHandler.prototype.handleMouseMove= function(evt) {
       if(evt.preventDefault)
           evt.preventDefault();
-    
+
       if (this.state == 'pan') {
           //$('svg')[0].hide(); 
           $$('svg')[0].setStyle('opacity', 0);
@@ -309,7 +309,7 @@ var AnnotoolsOpenSeadragonHandler = function(viewer, options){
                     var div    = $$('div.annotcontainer')[i];
                     
                     div.style.left   = (bbox.x + diff.x) + "px";
-                    div.style.top    = (bbox.y  + diff.y)+ "px";
+                    div.style.top    = (bbox.y + diff.y)+ "px";
                 }
           }
 
@@ -335,9 +335,94 @@ var AnnotoolsOpenSeadragonHandler = function(viewer, options){
     };
 
     AnnotoolsOpenSeadragonHandler.prototype.handleMouseWheel= function(evt) {
-     if(evt.preventDefault)
+      if(evt.preventDefault)
           evt.preventDefault();
-          
-     $$('svg')[0].setStyle('opacity', 0);
-    };
+      if((typeof($$('svg')[0]) != 'undefined') && ('setStyle' in $$('svg')[0]))
+          $$('svg')[0].setStyle('opacity', 0);
+
+      if (this.annotool.mode == 'free_markup')
+          this.annotool.markSaveClick(null);
+
+      if (evt.wheelDelta < 0)
+          this.viewer.viewport.zoomTo(this.viewer.viewport.getZoom()*1.2);
+      else
+          this.viewer.viewport.zoomTo(this.viewer.viewport.getZoom()/1.2);
+   };
+
+   AnnotoolsOpenSeadragonHandler.prototype.handleKeyPress= function(evt) {
+     console.log(evt);
+
+     delta = 48.0 / this.viewer.viewport.getZoom() * 0.005;
+     switch (evt.key) {
+        case "a":
+		  if (this.annotool.mode == 'free_markup')
+     		  {
+        		this.annotool.markSaveClick(null);
+     		  }
+		  delta_x = -delta; delta_y = 0;
+		  var pt = this.viewer.viewport.getCenter(true).plus(new OpenSeadragon.Point(delta_x, delta_y));
+		  this.viewer.viewport.panTo(pt, false);
+		  break;
+
+        case "d": 
+		  if (this.annotool.mode == 'free_markup')
+                  {
+                        this.annotool.markSaveClick(null);
+                  }
+		  delta_x = delta; delta_y = 0;
+                  var pt = this.viewer.viewport.getCenter(true).plus(new OpenSeadragon.Point(delta_x, delta_y));
+                  this.viewer.viewport.panTo(pt, false);
+		  break;
+
+        case "s": 
+		  if (this.annotool.mode == 'free_markup')
+                  {
+                        this.annotool.markSaveClick(null);
+                  }
+		  delta_x = 0; delta_y = delta;
+                  var pt = this.viewer.viewport.getCenter(true).plus(new OpenSeadragon.Point(delta_x, delta_y));
+                  this.viewer.viewport.panTo(pt, false);
+		  break;
+
+        case "w": 
+		  if (this.annotool.mode == 'free_markup')
+                  {
+                        this.annotool.markSaveClick(null);
+                  }
+		  delta_x = 0; delta_y = -delta;
+                  var pt = this.viewer.viewport.getCenter(true).plus(new OpenSeadragon.Point(delta_x, delta_y));
+                  this.viewer.viewport.panTo(pt, false);
+		  break;
+ 
+	case "q": annotool.toggleMarkups();
+		  break;
+
+	case "1": document.getElementById('LymPos').checked = true;
+		  break;
+
+        case "2": document.getElementById('LymNeg').checked = true;
+                  break;
+
+        case "3": document.getElementById('LymPosBig').checked = true;
+                  break;
+
+        case "4": document.getElementById('LymNegBig').checked = true;
+                  break;
+
+        case "5": document.getElementById('TumorPos').checked = true;
+                  break;
+
+        case "6": document.getElementById('TumorNeg').checked = true;
+                  break;
+
+        case "7": document.getElementById('rb_Moving').checked = true;
+                  var mock_evt = {target:{id:'rb_Moving'}};
+                  annotool.radiobuttonChange(mock_evt);
+                  break;
+     }
+     //var pt = this.viewer.viewport.getCenter(true).plus(new OpenSeadragon.Point(delta_x, delta_y));
+     //console.log(this.viewer.viewport.getZoom());
+     //this.viewer.viewport.panTo(pt, false);
+     //console.log(evt);
+   };
 

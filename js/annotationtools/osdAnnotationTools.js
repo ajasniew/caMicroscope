@@ -1172,13 +1172,11 @@ annotools.prototype.setupHandlers = function () {
   if (root != undefined) {
     if (navigator.userAgent.toLowerCase().indexOf('webkit') >= 0) {
       window.addEventListener('mousewheel', this.annotationHandler.handleMouseWheel, false) // Chrome/Safari
-    // window.addEventListener('mousewheel',   this.getAnnot(), false) // Chrome/Safari
     } else {
       window.addEventListener('DOMMouseScroll', this.annotationHandler.handleMouseWheel, false) // Others
-    // window.addEventListener('DOMMouseScroll', this.getAnnot(), false) // Others
     }
-    // console.log(root)
     this.addMouseEvents()
+    window.addEventListener('keypress', this.annotationHandler.handleKeyPress, false)
   }
   // console.log("...")
   for (var i = 0; i < this.viewer.buttons.buttons.length; i++) {
@@ -1553,15 +1551,7 @@ annotools.prototype.drawEllipse = function (ctx) {
     x = startPosition.x
     y = startPosition.y
   })
-  /*
-  this.drawCanvas.addEventListener('mousedown',function(e)
-  {
-      started = true
-      startPosition = OpenSeadragon.getMousePosition(e.event)
-      x = startPosition.x
-      y = startPosition.y
-  })
-  */
+
   this.drawCanvas.bind('mousemove', function (e) {
     if (started) {
       ctx.clearRect(0, 0, this.drawCanvas.width, this.drawCanvas.height)
@@ -2597,9 +2587,6 @@ annotools.prototype.addMouseEvents = function () {
   //console.log('adding mouse events')
   // console.log(this.annotationHandler)
   window.addEventListener('mousemove', this.annotationHandler.handleMouseMove, false)
-  //window.addEventListener('mousedown', this.annotationHandler.handleMouseDown, false)
-  //window.addEventListener('mouseup', this.annotationHandler.handleMouseUp, false)
-// window.addEventListener('mouseup',      this.getAnnot(), false)
 }
 annotools.prototype.removeMouseEvents = function () {
   //console.log('removing events')
@@ -3136,7 +3123,6 @@ annotools.prototype.barMouseDown = function(event)
 	console.log(bar_click);
 	console.log(event.target.id);
 	var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
-	//this.bar_var1.addEventListener('mousemove', this.barMouseSlide, false);
 	if (event.target.id == 'slide1' || event.target.id == 'bar1')
 	{
 		bar_click = 1;
@@ -3265,7 +3251,7 @@ annotools.prototype.loadHeatmapWeight = function()
 	     var sl2 = document.getElementById('slide2');
 	     var sl3 = document.getElementById('slide3');
 	     var div_lock = document.getElementById('div_weight_locked');
-		console.log(data);
+	     console.log(data);
 	     if (!data.startsWith('NaN')) { 
 	       parts = data.split('\n');
 	       //arr = [parseFloat(parts[0]), parseFloat(parts[1])];
@@ -3273,9 +3259,15 @@ annotools.prototype.loadHeatmapWeight = function()
 	       //var sl2 = document.getElementById('slide2');
 	       //var sl3 = document.getElementById('slide3');
 	       var lym = (parseFloat(parts[0]) * 100).toString() + '%';
+	       if (lym == 'NaN%')
+	           lym = 0.0;
 	       var nec = (parseFloat(parts[1]) * 100).toString() + '%';
+	       if (nec == 'NaN%')
+	           nec = 0.0;
 	       var smh = (parseFloat(parts[2]) * 100).toString() + '%';
-		console.log(smh);
+	       if (smh == 'NaN%')
+	           smh = 0.0;
+	       console.log(smh);
 	       sl1.style.width = lym;
 	       sl2.style.width = nec;
 	       sl3.style.width = smh;
