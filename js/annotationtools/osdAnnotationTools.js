@@ -3271,6 +3271,12 @@ annotools.prototype.loadHeatmapWeight = function()
 	       sl2.style.width = nec;
 	       sl3.style.width = smh;
 	       div_lock.innerHTML = "Locked";
+	       //var lym_f = parseFloat(lym.substring(0, lym.length)) / 100;
+	       //var nec_f = parseFloat(nec.substring(0, nec.length)) / 100;
+	       //var smh_f = parseFloat(smh.substring(0, smh.length)) / 100;
+	       //this.heat_weight = [lym_f, nec_f, smh_f];
+	       //console.log(this.heat_weight);
+	       self.updateHeatVarFromSlideBar();
 	     } else
 	     {
 		console.log('go else');

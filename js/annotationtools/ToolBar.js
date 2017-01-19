@@ -100,11 +100,8 @@ function goodalgo (data, status) {
   jQuery('#tree').attr('algotree', true)
 
   // Load weight
-  console.log(annotool.loadedWeight);
   if (annotool.loadedWeight == false) {
-      console.log('lalala');
       annotool.loadHeatmapWeight();
-      annotool.updateHeatVarFromSlideBar();
       annotool.loadedWeight = true;
   }
 
@@ -263,6 +260,20 @@ ToolBar.prototype.createButtons = function () {
       'id': 'freeLineMarkupButton'
     })
     tool.append(this.freeMarkupButton) 	  // Markup Pencil Tool
+
+    this.spacer = jQuery('<img>', {
+      'class': 'spacerButton inactive',
+      'src': 'images/spacer_empty.svg'
+    })
+    tool.append(this.spacer)
+    
+    this.switchUserButton = jQuery('<img>', {
+        'title': 'Switch user',
+        'class': 'toolButton inactive',
+        'src': 'images/switch_user.svg',
+        'id': 'switchUserButton',
+    });
+    tool.append(this.switchUserButton);     // Button for decreasing opacity
 	
    
     /*
@@ -288,6 +299,16 @@ ToolBar.prototype.createButtons = function () {
 	this.annotools.getMultiAnnot();
     }.bind(this))
 
+    this.switchUserButton.on('click', function () {
+	new_user = window.prompt('Change user from '.concat(this.annotools.username, ' to:'));
+	if (new_user != null && new_user.length > 2) {
+		this.annotools.username = new_user;
+		this.annotools.loadHeatmapWeight();
+      		this.annotools.loadedWeight = true;
+		this.annotools.getMultiAnnot();
+	}
+    }.bind(this))
+
     this.showWeightPanel.on('click', function () {
 	console.log('click on showing weight panel');
 	if (jQuery('#weightpanel').is(":visible"))
@@ -296,10 +317,6 @@ ToolBar.prototype.createButtons = function () {
 	}
 	else
 	{
-		//if (this.annotools.loadedWeight == false) {
-			//this.annotools.updateHeatVarFromSlideBar();
-			//this.annotools.loadedWeight = true;
-		//}
 		console.log(this.annotools.heat_weight);
 		jQuery('#weightpanel').show();
 	}
