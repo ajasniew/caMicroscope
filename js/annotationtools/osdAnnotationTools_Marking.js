@@ -1,8 +1,8 @@
 annotools.prototype.drawMarking = function (ctx) {
-  this.removeMouseEvents()
-  var started = false
-  var pencil = []
-  var newpoly = []
+  this.removeMouseEvents();
+  var started = false;
+  var pencil = [];
+  var newpoly = [];
   this.newpoly_arr = [];
   this.color_arr = [];
   this.anno_arr = [];
@@ -24,14 +24,14 @@ annotools.prototype.drawMarking = function (ctx) {
     started = true
     pencil = [];
     newpoly = [];
-    var startPoint = OpenSeadragon.getMousePosition(e.event)
-    var relativeStartPoint = startPoint.minus(OpenSeadragon.getElementOffset(viewer.canvas))
+    var startPoint = OpenSeadragon.getMousePosition(e.event);
+    var relativeStartPoint = startPoint.minus(OpenSeadragon.getElementOffset(viewer.canvas));
     newpoly.push({
       'x': relativeStartPoint.x,
       'y': relativeStartPoint.y
     })
-    ctx.beginPath()
-    ctx.moveTo(relativeStartPoint.x, relativeStartPoint.y)
+    ctx.beginPath();
+    ctx.moveTo(relativeStartPoint.x, relativeStartPoint.y);
 
     var drawn_linewidth = 3;
     // Check what radio box is checked
@@ -40,29 +40,29 @@ annotools.prototype.drawMarking = function (ctx) {
         ctx.strokeStyle = 'red';
         this.mark_type = 'LymPos';
         this.markupline_width = 2;
-	drawn_linewidth = 6;
+        drawn_linewidth = 6;
     }
 
     if (jQuery("#LymNegBig").is(':checked'))
     {
         ctx.strokeStyle = 'blue';
         this.mark_type = 'LymNeg';
-	this.markupline_width = 2;
-	drawn_linewidth = 6;
+        this.markupline_width = 2;
+        drawn_linewidth = 6;
     }
 
     if (jQuery("#LymPos").is(':checked'))
     {
-	ctx.strokeStyle = 'red';
-	this.mark_type = 'LymPos';
-	this.markupline_width = 1;
+        ctx.strokeStyle = 'red';
+        this.mark_type = 'LymPos';
+        this.markupline_width = 1;
     }
 
     if (jQuery("#LymNeg").is(':checked'))
     {
         ctx.strokeStyle = 'blue';
-	this.mark_type = 'LymNeg';
-	this.markupline_width = 1;
+        this.mark_type = 'LymNeg';
+        this.markupline_width = 1;
     }
 
     if (jQuery("#TumorPos").is(':checked'))
@@ -76,26 +76,25 @@ annotools.prototype.drawMarking = function (ctx) {
         ctx.strokeStyle = 'lime';
         this.mark_type = 'TumorNeg';
     }
-	console.log(this.mark_type);
+    console.log(this.mark_type);
 
     this.color_arr.push(ctx.strokeStyle);
-    //ctx.strokeStyle = this.color
     console.log(this.color);
     ctx.lineWidth = drawn_linewidth;
-    ctx.stroke()
+    ctx.stroke();
   }.bind(this))
 
   this.drawCanvas.addEvent('mousemove', function (e) {
-    var newPoint = OpenSeadragon.getMousePosition(e.event)
-    var newRelativePoint = newPoint.minus(OpenSeadragon.getElementOffset(viewer.canvas))
+    var newPoint = OpenSeadragon.getMousePosition(e.event);
+    var newRelativePoint = newPoint.minus(OpenSeadragon.getElementOffset(viewer.canvas));
     if (started) {
       newpoly.push({
         'x': newRelativePoint.x,
         'y': newRelativePoint.y
       })
 
-      ctx.lineTo(newRelativePoint.x, newRelativePoint.y)
-      ctx.stroke()
+      ctx.lineTo(newRelativePoint.x, newRelativePoint.y);
+      ctx.stroke();
     }
   })
 
@@ -121,8 +120,6 @@ annotools.prototype.drawMarking = function (ctx) {
           maxdistance = ((newpoly[j].x - x) * (newpoly[j].x - x) + (newpoly[j].y - y) * (newpoly[j].y - y))
           var endMousePosition = new OpenSeadragon.Point(newpoly[j].x, newpoly[j].y)
           endRelativeMousePosition = endMousePosition.minus(OpenSeadragon.getElementOffset(viewer.canvas))
-	  //console.log(endMousePosition);
-	  //console.log(endRelativeMousePosition);
         }
       }
 
@@ -177,51 +174,51 @@ annotools.prototype.drawMarking = function (ctx) {
 
 annotools.prototype.breakAndConvertToGeo = function ()
 {
-	// Refresh this.anno_arr
-	this.anno_arr = [];
-	this.marktype_broken_arr = [];
-	this.markwidth_broken_arr = [];
-	for (i = 0; i< this.rawAnnotArray.length; i++)
-	{
-		rawAnnot = this.rawAnnotArray[i];
+    // Refresh this.anno_arr
+    this.anno_arr = [];
+    this.marktype_broken_arr = [];
+    this.markwidth_broken_arr = [];
+    for (i = 0; i< this.rawAnnotArray.length; i++)
+    {
+        rawAnnot = this.rawAnnotArray[i];
 
-		// Convert rawAnnot
-		var floatPoints = [];
-		var point_str_set = rawAnnot.points.split(' ');
-		for (iPoint = 0; iPoint < point_str_set.length; iPoint++)
-		{
-			point_str = point_str_set[iPoint].split(',');
-			floatPoints.push([parseFloat(point_str[0]), parseFloat(point_str[1])]);
-		}
+        // Convert rawAnnot
+        var floatPoints = [];
+        var point_str_set = rawAnnot.points.split(' ');
+        for (iPoint = 0; iPoint < point_str_set.length; iPoint++)
+        {
+            point_str = point_str_set[iPoint].split(',');
+            floatPoints.push([parseFloat(point_str[0]), parseFloat(point_str[1])]);
+        }
 
-		brokenAnnot = JSON.parse(this.break_drawings(floatPoints));
-		coor_set = brokenAnnot.coordinate_set;
-		for (j = 0; j < coor_set.length; j++)
-		{
-			var newAnnot = {
-      				x: brokenAnnot.nativeX_set[j],
-      				y: brokenAnnot.nativeY_set[j],
-      				w: brokenAnnot.nativeW_set[j],
-      				h: brokenAnnot.nativeH_set[j],
-      				type: 'pencil_mark',
-      				points: coor_set[j],
-      				color: this.color_arr[i],
-      				loc: [parseFloat(brokenAnnot.nativeX_set[j]), parseFloat(brokenAnnot.nativeY_set[j])]
-    			};
-			var geojsonAnnot = this.convertPencilToGeo(newAnnot);
-			geojsonAnnot.object_type = 'marking';
-			this.anno_arr.push(geojsonAnnot);
-			this.marktype_broken_arr.push(this.marktype_arr[i]);
-			this.markwidth_broken_arr.push(this.markwidth_arr[i]);
-		}
-	}
+        brokenAnnot = JSON.parse(this.break_drawings(floatPoints));
+        coor_set = brokenAnnot.coordinate_set;
+        for (j = 0; j < coor_set.length; j++)
+        {
+            var newAnnot = {
+                x: brokenAnnot.nativeX_set[j],
+                y: brokenAnnot.nativeY_set[j],
+                w: brokenAnnot.nativeW_set[j],
+                h: brokenAnnot.nativeH_set[j],
+                type: 'pencil_mark',
+                points: coor_set[j],
+                color: this.color_arr[i],
+                loc: [parseFloat(brokenAnnot.nativeX_set[j]), parseFloat(brokenAnnot.nativeY_set[j])]
+            };
+            var geojsonAnnot = this.convertPencilToGeo(newAnnot);
+            geojsonAnnot.object_type = 'marking';
+            this.anno_arr.push(geojsonAnnot);
+            this.marktype_broken_arr.push(this.marktype_arr[i]);
+            this.markwidth_broken_arr.push(this.markwidth_arr[i]);
+        }
+    }
 }
 
 annotools.prototype.saveMarking = function (newAnnot, mark_type) {
     var val = {
-	'secret': 'mark1',
-	'mark_type': mark_type,
-	'username': this.username
+        'secret': 'mark1',
+        'mark_type': mark_type,
+        'username': this.username
     }
     //console.log(newAnnot);
     newAnnot.properties.annotations = val;
@@ -231,13 +228,13 @@ annotools.prototype.saveMarking = function (newAnnot, mark_type) {
 
 annotools.prototype.saveMarking_arr = function (newAnnot_arr, mark_type_arr, mark_width_arr) {
     for (iAnn = 0; iAnn < newAnnot_arr.length; iAnn++) {
-	var val = {
+        var val = {
             'secret': 'mark1',
             'mark_type': mark_type_arr[iAnn],
-	    'mark_width': mark_width_arr[iAnn],
+            'mark_width': mark_width_arr[iAnn],
             'username': this.username
-	}
-	newAnnot_arr[iAnn].properties.annotations = val;
+        }
+        newAnnot_arr[iAnn].properties.annotations = val;
     }
     this.addnewAnnot_Array(newAnnot_arr);
 }
@@ -248,35 +245,24 @@ annotools.prototype.markSave = function (notification, isSetNormalMode) {
         return;
 
     this.breakAndConvertToGeo();
-    /*
-    for (i = 0; i< this.anno_arr.length; i++)
-    {
-        //this.saveMarking(this.anno_arr[i], this.marktype_arr[i]);
-        this.saveMarking(this.anno_arr[i], this.marktype_broken_arr[i]);
-    }
-    */
     this.saveMarking_arr(this.anno_arr, this.marktype_broken_arr, this.markwidth_broken_arr);
     if (notification == true) {
         alert("Saved markup");
     }
     console.log(this.marktype_arr);
 
-    //jQuery('#markuppanel').hide('slide');
-    //this.drawLayer.hide();
-    //this.addMouseEvents();
     if (isSetNormalMode == true)
     {
-	jQuery('#markuppanel').hide('slide');
-	this.drawLayer.hide();
-	this.addMouseEvents();
-	this.toolBar.setNormalMode();
+        jQuery('#markuppanel').hide('slide');
+        this.drawLayer.hide();
+        this.addMouseEvents();
+        this.toolBar.setNormalMode();
     }
     else
     {
-	this.drawLayer.hide();
-	this.drawMarkups();
-	//this.toolBar.setNormalMode();
-	
+        this.drawLayer.hide();
+        this.drawMarkups();
+        //this.toolBar.setNormalMode();
     }
 }
 
@@ -302,56 +288,62 @@ annotools.prototype.reDrawCanvas = function () {
     ctx.clearRect(0, 0, this.drawCanvas.width, this.drawCanvas.height);
     for (i = 0; i< this.newpoly_arr.length; i++)
     {
-	path = this.newpoly_arr[i];
-	ctx.beginPath();
-	ctx.moveTo(path[0].x, path[0].y);
-	ctx.strokeStyle = this.color_arr[i];
-	ctx.lineWidth = 3.0;
-	ctx.stroke();
-	for (iptx = 1; iptx < path.length; iptx++)
-	{
-	     ctx.lineTo(path[iptx].x, path[iptx].y)
-	     ctx.stroke()
-	}
+        path = this.newpoly_arr[i];
+        ctx.beginPath();
+        ctx.moveTo(path[0].x, path[0].y);
+        ctx.strokeStyle = this.color_arr[i];
+        ctx.lineWidth = 3.0;
+        ctx.stroke();
+        for (iptx = 1; iptx < path.length; iptx++)
+        {
+            ctx.lineTo(path[iptx].x, path[iptx].y);
+            ctx.stroke();
+        }
     }
 }
 
-annotools.prototype.radiobuttonChange = function(event) {
-	console.log('rb changed');
-	console.log(this.marking_choice);
-	var self = this;
-        if (event.target.id == 'rb_Moving')
-        {
-		console.log('rb_Moving mode');
-
-		// Save current
-		this.markSave(false, false);
-
-		// Switch to normal mode
-		jQuery("canvas").css("cursor", "default");
-  		jQuery("#drawRectangleButton").removeClass('active');
-  		jQuery("#drawFreelineButton").removeClass('active');
-  		jQuery("#drawDotButton").removeClass("active");   // Dot Tool
-  		jQuery("#freeLineMarkupButton").removeClass("active");
-  		//jQuery("#markuppanel").hide('slide');
-  		this.drawLayer.hide()
-  		this.addMouseEvents()
-        }
-        else
-        {
-		if (this.marking_choice == 'rb_Moving')
-		{
-			console.log('change to drawing mode');
-			this.drawMarkups();
-			jQuery("canvas").css("cursor", "crosshair");
-			jQuery("#drawRectangleButton").removeClass("active");
-			jQuery("#drawDotButton").removeClass("active");     // Dot Tool
-			jQuery("#drawFreelineButton").removeClass("active");
-		}
-        }
-	this.marking_choice = event.target.id;
+annotools.prototype.switchUserRadiobuttonChange = function(event) {
+    this.username = event.target.value;
+    this.loadHeatmapWeight();
+    this.loadedWeight = true;
+    this.getMultiAnnot();
 }
 
+annotools.prototype.radiobuttonChange = function(event) {
+    console.log('rb changed');
+    console.log(this.marking_choice);
+    var self = this;
+    if (event.target.id == 'rb_Moving')
+    {
+        console.log('rb_Moving mode');
+
+        // Save current
+        this.markSave(false, false);
+
+        // Switch to normal mode
+        jQuery("canvas").css("cursor", "default");
+        jQuery("#drawRectangleButton").removeClass('active');
+        jQuery("#drawFreelineButton").removeClass('active');
+        jQuery("#drawDotButton").removeClass("active");   // Dot Tool
+        jQuery("#freeLineMarkupButton").removeClass("active");
+        //jQuery("#markuppanel").hide('slide');
+        this.drawLayer.hide();
+        this.addMouseEvents();
+    }
+    else
+    {
+        if (this.marking_choice == 'rb_Moving')
+        {
+            console.log('change to drawing mode');
+            this.drawMarkups();
+            jQuery("canvas").css("cursor", "crosshair");
+            jQuery("#drawRectangleButton").removeClass("active");
+            jQuery("#drawDotButton").removeClass("active");     // Dot Tool
+            jQuery("#drawFreelineButton").removeClass("active");
+        }
+    }
+    this.marking_choice = event.target.id;
+}
 
 
 annotools.prototype.break_drawings = function(nativepoints) {

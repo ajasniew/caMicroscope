@@ -13,7 +13,9 @@ var ToolBar = function (element, options) {
   this.iid = options.iid || null
   this.annotationActive = isAnnotationActive()
 
+  this.superuser = false;
 }
+
 ToolBar.prototype.showMessage = function (msg) {
   console.log(msg)
 }
@@ -152,6 +154,7 @@ ToolBar.prototype.setNormalMode = function() {
   jQuery("#drawDotButton").removeClass("active");   // Dot Tool
   jQuery("#freeLineMarkupButton").removeClass("active");
   jQuery("#markuppanel").hide();
+  jQuery("#switchuserpanel").hide();
   this.annotools.drawLayer.hide()
   this.annotools.addMouseEvents()       
 }
@@ -225,10 +228,10 @@ ToolBar.prototype.createButtons = function () {
     tool.append(this.heatDownButton);     // Button for decreasing opacity
 
     this.heatUpButton = jQuery('<img>', {
-	'title': 'Increase opacity',
-	'class': 'toolButton inactive',
-	'src': 'images/Opacity_up.svg',
-	'id': 'heatUpButton',
+        'title': 'Increase opacity',
+        'class': 'toolButton inactive',
+        'src': 'images/Opacity_up.svg',
+        'id': 'heatUpButton',
     });
     tool.append(this.heatUpButton);	// Button for increasing opacity
 
@@ -274,8 +277,7 @@ ToolBar.prototype.createButtons = function () {
         'id': 'switchUserButton',
     });
     tool.append(this.switchUserButton);     // Button for decreasing opacity
-	
-   
+
     /*
      * Event handlers on click for the buttons
      */
@@ -290,64 +292,62 @@ ToolBar.prototype.createButtons = function () {
     }.bind(this))
 
     this.heatUpButton.on('click', function () {
-	this.annotools.heatmap_opacity = Math.min(1, this.annotools.heatmap_opacity + 0.1);
-	this.annotools.getMultiAnnot();
+        this.annotools.heatmap_opacity = Math.min(1, this.annotools.heatmap_opacity + 0.1);
+        this.annotools.getMultiAnnot();
     }.bind(this))
 
     this.heatDownButton.on('click', function () {
-	this.annotools.heatmap_opacity = Math.max(0, this.annotools.heatmap_opacity - 0.1);
-	this.annotools.getMultiAnnot();
+        this.annotools.heatmap_opacity = Math.max(0, this.annotools.heatmap_opacity - 0.1);
+        this.annotools.getMultiAnnot();
     }.bind(this))
 
     this.switchUserButton.on('click', function () {
-	new_user = window.prompt('Change user from '.concat(this.annotools.username, ' to:'));
-	if (new_user != null && new_user.length > 2) {
-		this.annotools.username = new_user;
-		this.annotools.loadHeatmapWeight();
-      		this.annotools.loadedWeight = true;
-		this.annotools.getMultiAnnot();
-	}
+        if (this.superuser) {
+            if (jQuery('#switchuserpanel').is(":visible"))
+                jQuery('#switchuserpanel').hide();
+            else
+                jQuery('#switchuserpanel').show();
+        } else {
+            alert("You are not a super user. A super user can review and change other people's annotations. To apply for the super user privilege. please contact Le Hou (le.hou@stonybrook.edu).");
+        }
     }.bind(this))
 
     this.showWeightPanel.on('click', function () {
-	console.log('click on showing weight panel');
-	if (jQuery('#weightpanel').is(":visible"))
-	{
-		jQuery('#weightpanel').hide();
-	}
-	else
-	{
-		console.log(this.annotools.heat_weight);
-		jQuery('#weightpanel').show();
-	}
+        console.log('click on showing weight panel');
+        if (jQuery('#weightpanel').is(":visible"))
+        {
+            jQuery('#weightpanel').hide();
+        }
+        else
+        {
+            console.log(this.annotools.heat_weight);
+            jQuery('#weightpanel').show();
+        }
     }.bind(this))
 
-
     this.freeMarkupButton.on('click', function () {
+        if(this.annotools.mode == 'free_markup'){
+            this.setNormalMode();
+        } else {
+            //set pencil mode
+            this.annotools.mode = 'free_markup'
+            this.annotools.drawMarkups()
 
-      if(this.annotools.mode == 'free_markup'){
-        this.setNormalMode();
-      } else {
-        //set pencil mode
-        this.annotools.mode = 'free_markup'
-        this.annotools.drawMarkups()
-
-        jQuery("canvas").css("cursor", "crosshair");
-        //jQuery("drawFreelineButton").css("opacity", 1);
-        jQuery("#drawRectangleButton").removeClass("active");
-        jQuery("#drawDotButton").removeClass("active");     // Dot Tool
-	jQuery("#drawFreelineButton").removeClass("active");
-        jQuery("#freeLineMarkupButton").addClass("active");
-	jQuery("#markuppanel").show();
-
-	// Check if being on moving mode --> switch to drawing mode
-	if (document.getElementById("rb_Moving").checked) {
-		console.log('do switching');
-		document.getElementById('rb_Moving').checked = false;
-		document.getElementById('LymPos').checked = true;
-	}
-      }
-
+            jQuery("canvas").css("cursor", "crosshair");
+            //jQuery("drawFreelineButton").css("opacity", 1);
+            jQuery("#drawRectangleButton").removeClass("active");
+            jQuery("#drawDotButton").removeClass("active");     // Dot Tool
+            jQuery("#drawFreelineButton").removeClass("active");
+            jQuery("#freeLineMarkupButton").addClass("active");
+            jQuery("#markuppanel").show();
+ 
+            // Check if being on moving mode --> switch to drawing mode
+            if (document.getElementById("rb_Moving").checked) {
+                console.log('do switching');
+                document.getElementById('rb_Moving').checked = false;
+                document.getElementById('LymPos').checked = true;
+            }
+        }
     }.bind(this))
 
 

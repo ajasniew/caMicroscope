@@ -26,7 +26,7 @@ var annotools = function (options) {
   this.annotVisible = true // The Annotations are Set to be visible at the First Loading
   this.mode = 'default' // The Mode is Set to Default
 
-  this.username = options.username;	// Username from session variable
+  this.username = options.username; // Username from session variable
   console.log(this.username);
 
   this.viewer = options.viewer
@@ -75,6 +75,14 @@ Necrosis Prediction box:\n       Show necrosis prediction.\n\n\
 Lym Prediction with Nec Filtering box:\n       Show lymphocyte prediction with necrosis filtering (recommended).\n\n\
 ');}, false);
 
+  for (var su_i = 0; su_i <= 64; ++su_i) {
+      switch_user_eles = document.getElementById('switch_user_' + su_i.toString());
+      if (switch_user_eles != null) {
+          switch_user_eles.addEventListener('click', this.switchUserRadiobuttonChange.bind(this), false);
+      } else {
+          break;
+      }
+  }
 
   this.btn_savemark_var = document.getElementById('btn_savemark');
   this.btn_savemark_var.addEventListener('click', this.markSaveClick.bind(this), false);
@@ -142,7 +150,7 @@ To save/cancel your work, use the buttons described below:\n\
   cb1 = document.getElementById('cb1');
   cb2 = document.getElementById('cb2');
   cb3 = document.getElementById('cb3');
-  bar_click = 0;	// 0: no bar is clicked, 1: bar_1 is clicked, 2: bar_2 is clicked, 3: bar_3 is clicked
+  bar_click = 0;    // 0: no bar is clicked, 1: bar_1 is clicked, 2: bar_2 is clicked, 3: bar_3 is clicked
 
   bar_var1.addEventListener('mousedown', this.barMouseDown, false);
   bar_var1.addEventListener('mouseup', this.barMouseUp.bind(this), false);
@@ -510,9 +518,9 @@ annotools.prototype.drawMarkups = function () // Draw Markups
         break
       case 'measure':
         this.drawMeasure(ctx)
-	break
+        break
       case 'free_markup':
-	this.drawMarking(ctx)
+        this.drawMarking(ctx)
         break
     }
   } else this.showMessage('Container Not SET Correctly Or Not Fully Loaded Yet')
@@ -928,7 +936,7 @@ annotools.prototype.addnewAnnot = function (newAnnot) // Add New Annotations
 annotools.prototype.addnewAnnot_Array = function (newAnnot_arr) // Add New Annotations
 {
   for (i = 0; i< newAnnot_arr.length; i++) {
- 	this.saveAnnot_noRefresh(newAnnot_arr[i]);
+      this.saveAnnot_noRefresh(newAnnot_arr[i]);
   }
   $(document).ajaxStop(function () {
       // 0 === $.active
@@ -3114,94 +3122,94 @@ annotools.prototype.promptForDownload = function(newAnnot, mode, annotools, ctx)
 
 annotools.prototype.barMouseDown = function(event)
 {
-	if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
-        {
-                return;
-        }
+    if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+    {
+        return;
+    }
 
-	console.log('bar_mousedown');
-	console.log(bar_click);
-	console.log(event.target.id);
-	var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
-	if (event.target.id == 'slide1' || event.target.id == 'bar1')
-	{
-		bar_click = 1;
-		//slide_var1.style.width = (set_perc * 100) + '%';
-		selected_slide = slide_var1;
-	}
-	else if (event.target.id == 'slide2' || event.target.id == 'bar2')
-	{
-		bar_click = 2;
-		selected_slide = slide_var2;
-	}
-	else
-	{
-		bar_click = 3;
-		selected_slide = slide_var3;
-	}
+    console.log('bar_mousedown');
+    console.log(bar_click);
+    console.log(event.target.id);
+    var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+    if (event.target.id == 'slide1' || event.target.id == 'bar1')
+    {
+        bar_click = 1;
+        //slide_var1.style.width = (set_perc * 100) + '%';
+        selected_slide = slide_var1;
+    }
+    else if (event.target.id == 'slide2' || event.target.id == 'bar2')
+    {
+        bar_click = 2;
+        selected_slide = slide_var2;
+    }
+    else
+    {
+        bar_click = 3;
+        selected_slide = slide_var3;
+    }
 
-	selected_slide.style.width = (set_perc * 100) + '%';
+    selected_slide.style.width = (set_perc * 100) + '%';
 }
 
 annotools.prototype.barMouseUp = function(event)
 {
-	if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
-        {
-                return;
-        }
+    if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+    {
+        return;
+    }
 
-	var self = this;
-        //console.log('bar_mouseup');
-	if (bar_click == 0)
-	{
-		return;
-	}
-	var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
-	this.heat_weight[bar_click-1] = set_perc;
-	console.log(set_perc);
-	bar_click = 0;
-	this.cb_checked[0] = document.getElementById('cb1').checked;
-	this.cb_checked[1] = document.getElementById('cb2').checked;
-	this.cb_checked[2] = document.getElementById('cb3').checked;
-	self.getMultiAnnot();
+    var self = this;
+    //console.log('bar_mouseup');
+    if (bar_click == 0)
+    {
+        return;
+    }
+    var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+    this.heat_weight[bar_click-1] = set_perc;
+    console.log(set_perc);
+    bar_click = 0;
+    this.cb_checked[0] = document.getElementById('cb1').checked;
+    this.cb_checked[1] = document.getElementById('cb2').checked;
+    this.cb_checked[2] = document.getElementById('cb3').checked;
+    self.getMultiAnnot();
 }
 
 annotools.prototype.barMouseSlide = function(event)
 {
-	if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
-	{
-		return;
-	}
+    if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+    {
+        return;
+    }
 
-	if (bar_click != 0)
-	{
-        	//console.log('bar_mouseslide');
-		var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
-		if (bar_click == 1)
-		{
-			slide_var1.style.width = (set_perc * 100) + '%';
-		}
-		else if (bar_click == 2)
-		{
-			slide_var2.style.width = (set_perc * 100) + '%';
-		}
-		else
-		{
-			slide_var3.style.width = (set_perc * 100) + '%';
-		}
-	}
+    if (bar_click != 0)
+    {
+        //console.log('bar_mouseslide');
+        var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+        if (bar_click == 1)
+        {
+            slide_var1.style.width = (set_perc * 100) + '%';
+        }
+        else if (bar_click == 2)
+        {
+            slide_var2.style.width = (set_perc * 100) + '%';
+        }
+        else
+        {
+            slide_var3.style.width = (set_perc * 100) + '%';
+        }
+    }
 }
 
 annotools.prototype.checkboxChange = function(event)
 {
-	var self = this;
-	if (event.target.id == 'cb1')
-	{
-	}
-	else
-	{
-	}
-	self.getMultiAnnot();
+    var self = this;
+    if (event.target.id == 'cb1')
+    {
+    }
+    else
+    {
+    }
+    self.getMultiAnnot();
 }
 
 // Added for temp weight boxes
@@ -3213,98 +3221,97 @@ annotools.prototype.lymnecWeightChange = function(event)
 
 annotools.prototype.saveHeatmapWeight = function(event)
 {
-	var self = this;
-	console.log('enter save heatmap');
-	$.ajax({
-           type: "POST",
-           url: "php/save_weight.php",
-           data: {iid: self.iid, lymweight: this.heat_weight[0], necweight: this.heat_weight[1], smoothness: this.heat_weight[2], user: this.username},
-           dataType: "text",
-           success: function(data) {
-               console.log(data);
-	       if (data.startsWith('Locked'))
-	       {
-		    console.log('being locked');
-		    alert ('This heatmap has been locked');
-	       }
-	       else
-	       {
-		    document.getElementById('div_weight_locked').innerHTML = 'Locked';
-		    alert('Saved heatmap weights');
-	       }
-	   }
-	});
+    var self = this;
+    console.log('enter save heatmap');
+    $.ajax({
+        type: "POST",
+        url: "php/save_weight.php",
+        data: {iid: self.iid, lymweight: this.heat_weight[0], necweight: this.heat_weight[1], smoothness: this.heat_weight[2], user: this.username},
+        dataType: "text",
+        success: function(data) {
+            console.log(data);
+            if (data.startsWith('Locked')) {
+                console.log('being locked');
+                alert ('This heatmap has been locked');
+            } else {
+                document.getElementById('div_weight_locked').innerHTML = 'Locked';
+                alert('Saved heatmap weights');
+            }
+        }
+    });
 }
 
 annotools.prototype.loadHeatmapWeight = function()
 {
-	var self = this;
-        console.log('Load heatmap weights');
-	console.log(self.iid);
-        $.ajax({
-           type: "POST",
-           url: "php/load_weight.php",
-           data: {iid: self.iid, user: this.username},
-           dataType: "text",
-           success: function(data) {
-	     var sl1 = document.getElementById('slide1');
-	     var sl2 = document.getElementById('slide2');
-	     var sl3 = document.getElementById('slide3');
-	     var div_lock = document.getElementById('div_weight_locked');
-	     console.log(data);
-	     if (!data.startsWith('NaN')) { 
-	       parts = data.split('\n');
-	       //arr = [parseFloat(parts[0]), parseFloat(parts[1])];
-	       //var sl1 = document.getElementById('slide1');
-	       //var sl2 = document.getElementById('slide2');
-	       //var sl3 = document.getElementById('slide3');
-	       var lym = (parseFloat(parts[0]) * 100).toString() + '%';
-	       if (lym == 'NaN%')
-	           lym = '50%';
-	       var nec = (parseFloat(parts[1]) * 100).toString() + '%';
-	       if (nec == 'NaN%')
-	           nec = '50%';
-	       var smh = (parseFloat(parts[2]) * 100).toString() + '%';
-	       if (smh == 'NaN%')
-	           smh = '0%';
-	       sl1.style.width = lym;
-	       sl2.style.width = nec;
-	       sl3.style.width = smh;
-	       div_lock.innerHTML = "Locked";
-	       //var lym_f = parseFloat(lym.substring(0, lym.length)) / 100;
-	       //var nec_f = parseFloat(nec.substring(0, nec.length)) / 100;
-	       //var smh_f = parseFloat(smh.substring(0, smh.length)) / 100;
-	       //this.heat_weight = [lym_f, nec_f, smh_f];
-	       //console.log(this.heat_weight);
-	       self.updateHeatVarFromSlideBar();
-	     } else
-	     {
-		console.log('go else');
-		sl1.style.width = '50%';
-		sl2.style.width = '50%';
-		sl3.style.width = '0%';
-		div_lock.innerHTML = "Free";
-	     }
-           }
-        });
+    var self = this;
+    console.log('Load heatmap weights');
+    console.log(self.iid);
+    $.ajax({
+        type: "POST",
+        url: "php/load_weight.php",
+        data: {iid: self.iid, user: this.username},
+        dataType: "text",
+        success: function(data) {
+            var sl1 = document.getElementById('slide1');
+            var sl2 = document.getElementById('slide2');
+            var sl3 = document.getElementById('slide3');
+            var div_lock = document.getElementById('div_weight_locked');
+            console.log(data);
+            if (!data.startsWith('NaN')) { 
+                parts = data.split('\n');
+                //arr = [parseFloat(parts[0]), parseFloat(parts[1])];
+                //var sl1 = document.getElementById('slide1');
+                //var sl2 = document.getElementById('slide2');
+                //var sl3 = document.getElementById('slide3');
+                var lym = (parseFloat(parts[0]) * 100).toString() + '%';
+                if (lym == 'NaN%') {
+                    lym = '50%';
+                }
+                var nec = (parseFloat(parts[1]) * 100).toString() + '%';
+                if (nec == 'NaN%') {
+                    nec = '50%';
+                }
+                var smh = (parseFloat(parts[2]) * 100).toString() + '%';
+                if (smh == 'NaN%') {
+                    smh = '0%';
+                }
+                sl1.style.width = lym;
+                sl2.style.width = nec;
+                sl3.style.width = smh;
+                div_lock.innerHTML = "Locked";
+                //var lym_f = parseFloat(lym.substring(0, lym.length)) / 100;
+                //var nec_f = parseFloat(nec.substring(0, nec.length)) / 100;
+                //var smh_f = parseFloat(smh.substring(0, smh.length)) / 100;
+                //this.heat_weight = [lym_f, nec_f, smh_f];
+                //console.log(this.heat_weight);
+                self.updateHeatVarFromSlideBar();
+            } else {
+                console.log('go else');
+                sl1.style.width = '50%';
+                sl2.style.width = '50%';
+                sl3.style.width = '0%';
+                div_lock.innerHTML = "Free";
+            }
+        }
+    });
 
-	// Wait for the load weight transfering data
-	var start = new Date().getTime();
-  	var delay = 200;
-  	while (new Date().getTime() < start + delay);
-	console.log(document.getElementById('slide1').style.width);
-	console.log(document.getElementById('div_weight_locked').innerHTML);
-	self.getMultiAnnot();
+    // Wait for the load weight transfering data
+    var start = new Date().getTime();
+    var delay = 200;
+    while (new Date().getTime() < start + delay);
+    console.log(document.getElementById('slide1').style.width);
+    console.log(document.getElementById('div_weight_locked').innerHTML);
+    self.getMultiAnnot();
 }
 
 annotools.prototype.updateHeatVarFromSlideBar = function()
 {
-	var sl1 = document.getElementById('slide1');
-	var sl2 = document.getElementById('slide2');
-	var sl3 = document.getElementById('slide3');
-	var lym = parseFloat(sl1.style.width.substring(0, sl1.style.width.length)) / 100;
-	var nec = parseFloat(sl2.style.width.substring(0, sl2.style.width.length)) / 100;
-	var smh = parseFloat(sl3.style.width.substring(0, sl3.style.width.length)) / 100;
-	this.heat_weight = [lym, nec, smh];
+    var sl1 = document.getElementById('slide1');
+    var sl2 = document.getElementById('slide2');
+    var sl3 = document.getElementById('slide3');
+    var lym = parseFloat(sl1.style.width.substring(0, sl1.style.width.length)) / 100;
+    var nec = parseFloat(sl2.style.width.substring(0, sl2.style.width.length)) / 100;
+    var smh = parseFloat(sl3.style.width.substring(0, sl3.style.width.length)) / 100;
+    this.heat_weight = [lym, nec, smh];
 }
 
