@@ -46,6 +46,7 @@ var annotools = function (options) {
   this.marking_choice = 'LymPos';
   //this.isLoadedWeight = false;
   this.loadHeatmapWeight();
+  this.btn_revertWeight = document.getElementById('btn_revertWeight');
   this.btn_saveWeight = document.getElementById('btn_saveHeatmapWeight');
   this.btn_saveweight_help = document.getElementById('btn_heatmapweight_help');
   this.rb_lymposbig = document.getElementById('LymPosBig');
@@ -63,6 +64,7 @@ var annotools = function (options) {
   this.rb_tumneg.addEventListener('click', this.radiobuttonChange.bind(this), false);
   this.rb_move.addEventListener('click', this.radiobuttonChange.bind(this), false);
 
+  this.btn_revertWeight.addEventListener('click', this.revertWeight.bind(this), false);
   this.btn_saveWeight.addEventListener('click', this.saveHeatmapWeight.bind(this), false);
   this.btn_saveweight_help.addEventListener('click', function(){alert('\
 This panel allows you to adjust the automatic lymphocyte prediction results for this slide, with the options described below.\n\n\
@@ -139,6 +141,7 @@ To save/cancel your work, use the buttons described below:\n\
   this.multipleHeatmapColor = [];
   this.cb_checked = [false, false, false];
   this.heat_weight = [0.5, 0.5, 0.0];
+  this.prev_heat_weight = [0.5, 0.5, 0.0];
   this.loadedWeight = false;
   //this.loadHeatmapWeight();
   bar_var1 = document.getElementById('bar1');
@@ -3165,6 +3168,8 @@ annotools.prototype.barMouseUp = function(event)
         return;
     }
     var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+    //this.prev_heat_weight[bar_click-1] = this.heat_weight[bar_click-1];
+    this.prev_heat_weight = this.heat_weight.slice();
     this.heat_weight[bar_click-1] = set_perc;
     console.log(set_perc);
     bar_click = 0;
@@ -3278,6 +3283,7 @@ annotools.prototype.loadHeatmapWeight = function()
                 sl1.style.width = lym;
                 sl2.style.width = nec;
                 sl3.style.width = smh;
+		this.prev_heat_weight = [lym, nec, smh];
                 div_lock.innerHTML = "Locked";
                 //var lym_f = parseFloat(lym.substring(0, lym.length)) / 100;
                 //var nec_f = parseFloat(nec.substring(0, nec.length)) / 100;
@@ -3290,6 +3296,7 @@ annotools.prototype.loadHeatmapWeight = function()
                 sl1.style.width = '50%';
                 sl2.style.width = '50%';
                 sl3.style.width = '0%';
+		this.prev_heat_weight = [0.5, 0.5, 0];
                 div_lock.innerHTML = "Free";
             }
         }
@@ -3306,6 +3313,7 @@ annotools.prototype.loadHeatmapWeight = function()
 
 annotools.prototype.updateHeatVarFromSlideBar = function()
 {
+    this.prev_heat_weight = this.heat_weight;
     var sl1 = document.getElementById('slide1');
     var sl2 = document.getElementById('slide2');
     var sl3 = document.getElementById('slide3');
@@ -3313,5 +3321,28 @@ annotools.prototype.updateHeatVarFromSlideBar = function()
     var nec = parseFloat(sl2.style.width.substring(0, sl2.style.width.length)) / 100;
     var smh = parseFloat(sl3.style.width.substring(0, sl3.style.width.length)) / 100;
     this.heat_weight = [lym, nec, smh];
+}
+
+annotools.prototype.revertWeight = function(event)
+{
+    var self = this;
+    if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+    {
+        return;
+    }
+    console.log('revert weights');
+    var sl1 = document.getElementById('slide1');
+    var sl2 = document.getElementById('slide2');
+    var sl3 = document.getElementById('slide3');
+    var div_lock = document.getElementById('div_weight_locked');
+
+    console.log(this.prev_heat_weight);
+    sl1.style.width = this.prev_heat_weight[0]*100 + '%';
+    sl2.style.width = this.prev_heat_weight[1]*100 + '%';
+    sl3.style.width = this.prev_heat_weight[2]*100 + '%';
+    self.updateHeatVarFromSlideBar();
+
+    self.getMultiAnnot();
+
 }
 

@@ -109,6 +109,8 @@
             <label class="lb_heatmap"><input type="checkbox" id="cb2" checked> Necrosis Specificity</label>
             <div id="bar3" class="bar" align="right"><div id="slide3" class="slide"></div></div>
             <label class="lb_heatmap"><input type="checkbox" id="cb3" checked> Smoothness</label><br><p>
+	    
+	    <button type="button" class="btn_heatmap" id="btn_revertWeight">Revert Weights</button>
 
             <br><p>
             <input type="radio" name="weighttype" value="LymSe" id="LymSe"> <label for="LymSe" class=radio_markup>Lymphocyte Prediction</label> <br>
