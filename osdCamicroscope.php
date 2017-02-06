@@ -152,7 +152,7 @@
                 if (strpos($fname, $iid) !== false) {
                     $email = explode('_', $fname)[1];
                     $email = substr($email, 0, strlen($email) - 4);
-                    if (strcmp($email, $orig_email) == 0) {
+                    if (strcmp($email, $orig_email) != 0) {
                         printf("<input type=\"radio\" name=\"usergroup\" value=\"%s\" \
                             id=\"switch_user_%d\" class=\"radio_user\">\n", $email, $ele_id);
                     } else {
