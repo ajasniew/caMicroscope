@@ -380,6 +380,10 @@ annotools.prototype.generateSVG = function (annotations) {
 		lym_checked = (document.getElementById('LymSe').checked || document.getElementById('BothSe').checked);
 		nec_checked = (document.getElementById('NecSe').checked || document.getElementById('BothSe').checked);
 
+
+		selected_heatmap = this.heatmapColor[0];
+		selected_opacity = this.heatmap_opacity;
+
 		if (intersect_label[i] != 0)
 		{
 			switch (intersect_label[i])
@@ -392,25 +396,35 @@ annotools.prototype.generateSVG = function (annotations) {
 		{
 			if (lym_checked == true && nec_checked == false)
 			{
-				svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+				selected_heatmap = this.heatmapColor[lym_color_index];
+				//svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
 			}
 
 			if (lym_checked == false && nec_checked == true)
 			{
-				svgHtml += '" style="fill:' + this.heatmapColor[nec_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+				selected_heatmap = this.heatmapColor[nec_color_index];
+				//svgHtml += '" style="fill:' + this.heatmapColor[nec_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
 			}
 
 			if (lym_checked == true && nec_checked == true)
 			{
-				svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index*(1-nec_color_index)] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
-				//svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index+nec_color_index] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+				selected_heatmap = this.heatmapColor[lym_color_index*(1-nec_color_index)];
+				//svgHtml += '" style="fill:' + this.heatmapColor[lym_color_index*(1-nec_color_index)] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
 			}
 
 			if (lym_checked == false && nec_checked == false)
 			{
-				svgHtml += '" style="fill:' + this.heatmapColor[0] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
+				selected_heatmap = this.heatmapColor[0];
+				//svgHtml += '" style="fill:' + this.heatmapColor[0] + ';fill-opacity: ' + this.heatmap_opacity + ';stroke-width:0"/>';
 			}
 		}
+		
+		if (selected_heatmap == this.heatmapColor[0])
+		{
+			selected_opacity = 0.2;
+		}
+
+		svgHtml += '" style="fill:' + selected_heatmap + ';fill-opacity: ' + selected_opacity + ';stroke-width:0"/>';
 		/*
 		var combo = lym_score;
 		if (nec_score >= (1-this.heat_weight1))
