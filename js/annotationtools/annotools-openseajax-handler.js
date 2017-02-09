@@ -477,6 +477,9 @@ var AnnotoolsOpenSeadragonHandler = function(viewer, options){
                   var mock_evt = {target:{id:'rb_Moving'}};
                   annotool.radiobuttonChange(mock_evt);
                   break;
+
+	case "q": annotool.revertWeight(null);
+		  break;
      }
    };
 
