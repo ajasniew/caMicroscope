@@ -1,8 +1,14 @@
-    <?php 
+ <?php 
+	session_start();
 	require '../authenticate.php';
 
     $config = require 'api/Configuration/config.php';
-
+    //Set cancer type
+      if(isset($_GET["cancerType"])){
+          $cancerType = $_GET["cancerType"];
+          $_SESSION["cancerType"] = "u24_" . $cancerType;
+      }
+      $config = require 'api/Configuration/config.php';
     ?>
     <!DOCTYPE html>
     <html>
@@ -11,15 +17,17 @@
 
         <title>[caMicroscope OSD][Subject: <?php echo json_encode($_GET['tissueId']); ?>][User: <?php echo $_SESSION["name"]; ?>]</title>
 
-
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        
         <link rel="stylesheet" type="text/css" media="all" href="css/annotools.css" />
+
         <!--<link rel="stylesheet" type="text/css" media="all" href="css/jquery-ui.min.css" />-->
         <link rel="stylesheet" type="text/css" media="all" href="css/simplemodal.css" />
         <link rel="stylesheet" type="text/css" media="all" href="css/ui.fancytree.min.css" />
-    
+        <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.7.0/jquery.modal.css" />
         <script src="js/dependencies/jquery.js"></script>
-
+  
+  
         <!--JSON Form dependencies-->
 
         <script type="text/javascript" src="js/dependencies/underscore.js">
@@ -30,12 +38,14 @@
         <script type="text/javascript" src="js/dependencies/jsonform.js"></script>
         <script type="text/javascript" src="js/dependencies/jsv.js"></script>
         <!--End JSON Form dependencies -->
-
-
+  
         <script src="js/openseadragon/openseadragon-bin-2.0.0/openseadragon.js"></script>
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script> 
         <script src="js/openseadragon/openseadragon-imaginghelper.min.js"></script>
         <script src="js/openseadragon/openseadragon-scalebar.js"></script>
         <script src="js/openseadragon/openseadragonzoomlevels.js"></script>
+
         <script type="text/javascript" src="js/mootools/mootools-core-1.4.5-full-nocompat-yc.js"></script>
         <script type="text/javascript" src="js/mootools/mootools-more-1.4.0.1-compressed.js"></script>
         <script src="js/annotationtools/annotools-openseajax-handler.js"></script>
@@ -43,52 +53,61 @@
         <script src="js/annotationtools/ToolBar.js"></script>
         <script src="js/annotationtools/AnnotationStore.js"></script>
         <script src="js/annotationtools/osdAnnotationTools.js"></script>
+		<script src="js/annotationtools/osdAnnotationTools_Marking.js"></script>
         <script src="js/annotationtools/geoJSONHandler.js"></script>
         <script src="js/dependencies/MD5.js"></script>
-        <script src="https://code.jquery.com/ui/1.11.2/jquery-ui.min.js" type="text/javascript"></script> 
-    
-
+        <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.min.js" type="text/javascript"></script>
         <!--Filtering Tools-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/camanjs/4.1.2/caman.full.js"></script>
         <script src="js/filteringtools/openseadragon-filtering.js"></script>
         <script src="js/filteringtools/spinner-slider.js"></script>
         <script src="js/filteringtools/spinner.js"></script>
         <script src="js/filteringtools/FilterTools.js"></script>
-        <!--End Filtering Tools-->    
+        <!--End Filtering Tools-->   
+        
         <!--<script src="js/dependencies/jquery-ui.min.js"></script>-->
 
         <script src="js/dependencies/jquery.fancytree-all.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.7.0/jquery.modal.js"> </script>
         <script src="js/dependencies/simplemodal.js"></script>
+        <script src="js/dependencies/d3.js"></script>
         <style type="text/css">
-            .openseadragon
-            {
-                height: 100%;
-                min-height: 100%;
-                width: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
-                margin: 0;
-                padding: 0;
-                background-color: #E8E8E8;
-                border: 1px solid black;
-                color: white;
-            }
-
+        .openseadragon
+        {
+            height: 100%;
+            min-height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 0;
+            padding: 0;
+            background-color: #E8E8E8;
+            border: 1px solid black;
+            color: white;
+        }
+        .controls textarea{
+          height: 50px;
+        }
         .navWindow
-
         {
             position: absolute;
-                z-index: 10001;
-                right: 0;
-                bottom: 0;
-                border: 1px solid yellow;
+            z-index: 10001;
+            right: 0;
+            bottom: 0;
+            border: 1px solid yellow;
         }
+.modal a.close-modal{
+  top: 0;
+  right: 0;
+}
         </style>
+         <link rel="stylesheet" type="text/css" media="all" href="css/annotools.css" /> 
+	 <link rel="stylesheet" type="text/css" media="all" href="css/multiheattools.css" />
     </head>
 
     <body>
-
+        
         <div id="container">
                     
             <div id="tool"></div>
@@ -96,26 +115,100 @@
             <div id="bookmarkURLDiv"></div>
         <div id="algosel"><div id="tree"></div></div>
 
+        <div id="tool"></div>
+
+        <div id="weightpanel">
+            <div id="bar1" class="bar" align="right"><div id="slide1" class="slide"></div></div>
+            <label class="lb_heatmap"><input type="checkbox" id="cb1" checked> Lymphocyte Sensitivity</label>
+            <div id="bar2" class="bar" align="right"><div id="slide2" class="slide"></div></div>
+            <label class="lb_heatmap"><input type="checkbox" id="cb2" checked> Necrosis Specificity</label>
+            <div id="bar3" class="bar" align="right"><div id="slide3" class="slide"></div></div>
+            <label class="lb_heatmap"><input type="checkbox" id="cb3" checked> Smoothness</label><br><p>
+	    
+	    <button type="button" class="btn_heatmap" id="btn_revertWeight">Revert Weights</button>
+
+            <br><p>
+            <input type="radio" name="weighttype" value="LymSe" id="LymSe"> <label for="LymSe" class=radio_markup>Lymphocyte Prediction</label> <br>
+            <input type="radio" name="weighttype" value="NecSe" id="NecSe"> <label for="NecSe" class=radio_markup>Necrosis Prediction</label> <br>
+            <input type="radio" name="weighttype" value="BothSe" id="BothSe" checked> <label for="BothSe" class=radio_markup>Lym Prediction with Nec Filtering</label> <br>
+            <button type="button" class="btn_heatmap" id="btn_saveHeatmapWeight">Finalize</button>
+            <button type="button" class="btn_heatmap" id="btn_heatmapweight_help">&#x2753</button>
+        </div>
+
+        <div id="markuppanel">
+        <input type="radio" name="marktype" value="LymPos" checked="checked" id="LymPos" class="radio_markup">
+            <label for="LymPos" class=radio_markup> (1) LymPos (draw thin line)</label><br>
+        <input type="radio" name="marktype" value="LymNeg" id="LymNeg" class="radio_markup">
+            <label for="LymNeg" class=radio_markup> (2) LymNeg (draw thin line)</label><br><p><p>
+        <input type="radio" name="marktype" value="LymPosBig" id="LymPosBig" class="radio_markup">
+            <label for="LymPosBig" class=radio_markup> (3) LymPos (draw thick line)</label><br>
+        <input type="radio" name="marktype" value="LymNegBig" id="LymNegBig" class="radio_markup">
+            <label for="LymNegBig" class=radio_markup> (4) LymNeg (draw thick line)</label><br><p><p>
+        <input type="radio" name="marktype" value="TumorPos" id="TumorPos" class="radio_markup">
+            <label for="TumorPos" class=radio_markup> (5) TumorPos (draw polygon)</label><br>
+        <input type="radio" name="marktype" value="TumorNeg" id="TumorNeg" class="radio_markup">
+            <label for="TumorNeg" class=radio_markup> (6) TumorNeg (draw polygon)</label><br><p><p>
+        <input type="radio" name="marktype" value="Moving" id="rb_Moving" class="radio_markup">
+            <label for="rb_Moving" class=radio_markup> (7) Save then Navigate</label><br>
+        <button type="button" class="btn_mark" id="btn_savemark">Save</button>
+        <button type="button" class="btn_mark" id="btn_undomark" >Cancel</button>
+        <button type="button" class="btn_mark" id="btn_mark_help">&#x2753</button> </div>
+        <div id="div_weight_locked" style="display: none;">Free</div>
+
+        <div id="switchuserpanel">
+        Change username to: <br><p><p>
+        <?php
+            $iid = $_GET['tissueId'];
+            $orig_email = $_GET['email'];
+            $files = scandir('data/');
+            $ele_id = 0;
+            for ($i = 0; $i < count($files); ++$i) {
+                $fname = $files[$i];
+                if (strpos($fname, $iid) !== false) {
+                    $email = explode('_', $fname)[1];
+                    $email = substr($email, 0, strlen($email) - 4);
+                    if (strcmp($email, $orig_email) != 0) {
+                        printf("<input type=\"radio\" name=\"usergroup\" value=\"%s\" \
+                            id=\"switch_user_%d\" class=\"radio_user\">\n", $email, $ele_id);
+                    } else {
+                        printf("<input type=\"radio\" name=\"usergroup\" value=\"%s\" checked=\"checked\" \
+                            id=\"switch_user_%d\" class=\"radio_user\">\n", $email, $ele_id);
+                    }
+                    printf("<label for=\"%s\" class=radio_user> %s </label><br>\n", $email, $email);
+                    $ele_id ++;
+                }
+            }
+        ?>
+        </div>
+
+        <div id="algosel"><div id="tree"></div></div>
             <div class="demoarea">
                 <div id="viewer" class="openseadragon"></div>
             </div>
         <div id"navigator"></div>
 
         </div>
-
+        <div id="confirmDelete" style="display:none">
+          <p> Please enter the secret: <input id="deleteSecret" type="password" /> <a href="#confirmDelete" rel="modal:close"><button id="confirmDeleteButton">Delete</button></a></p>
+        </div>
         <script type="text/javascript">
           $.noConflict();
           var annotool = null;
           var tissueId = <?php echo json_encode($_GET['tissueId']); ?>;
 
-
+          var cancerType = "<?php echo $_SESSION["cancerType"] ?>";
+          console.log(cancerType);
           var imagedata = new OSDImageMetaData({imageId:tissueId});
-         
+          //console.log(tissueId);
+          //console.log(imagedata);
+          //console.log(tissueId);
+          
           var MPP = imagedata.metaData[0];
-
-
-          var fileLocation = imagedata.metaData[1];
-         jQuery("#bookmarkURLDiv").hide();
+            //console.log(MPP);
+            //console.log(imagedata);
+          var fileLocation = imagedata.metaData[1];//.replace("tcga_data","tcga_images");
+            jQuery("#bookmarkURLDiv").hide();
+          //console.log(fileLocation);
          
           var viewer = new OpenSeadragon.Viewer({ 
                 id: "viewer", 
@@ -127,7 +220,7 @@
                 animationTime: 0.75,
                 maxZoomPixelRatio: 2,
                 visibilityRatio: 1,
-                constrainDuringPan: true,
+                constrainDuringPan: true
                 //zoomPerScroll: 1
           });
             //console.log(viewer.navigator);
@@ -152,33 +245,34 @@
               backgroundColor: "rgba(255,255,255,0.5)",
               barThickness: 2
             });
-
+            
             viewer.setFilterOptions({
                 filters: {
                     processors: OpenSeadragon.Filters.BRIGHTNESS(0)
                 }
 });
-
+            
     //console.log(viewer);
-function isAnnotationActive(){
-    this.isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-    this.isFirefox = typeof InstallTrigger !== 'undefined';
-    this.isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
-    this.isChrome = !!window.chrome;
-    //console.log(this.isFirefox);
-    this.annotationActive = !( this.isIE || this.isOpera);
-    return this.annotationActive;
-}
+    function isAnnotationActive(){
+        this.isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+        this.isFirefox = typeof InstallTrigger !== 'undefined';
+        this.isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+        this.isChrome = !!window.chrome;
+        this.annotationActive = !(this.isIE || this.isOpera);
+        return this.annotationActive;
+    }
 
     function addOverlays() {
         var annotationHandler = new AnnotoolsOpenSeadragonHandler(viewer, {});
-        
+        var sessionUsername = <?php echo '"' . $_SESSION['email'] . '"' ?>;
+        //var sessionUsername = 'test@gmail.com';
         annotool= new annotools({
                 canvas:'openseadragon-canvas',
                 iid: tissueId, 
                 viewer: viewer,
                 annotationHandler: annotationHandler,
-                mpp:MPP
+                mpp:MPP,
+                username: sessionUsername
             });
         filteringtools = new FilterTools();
         //console.log(tissueId);
@@ -190,39 +284,36 @@ function isAnnotationActive(){
                 iid: tissueId,
                 annotool: annotool,
                 FilterTools: filteringtools
+           
         });
+
+        $.ajax({
+            type: "POST",
+            url: "php/check_super_user.php",
+            data: {user: sessionUsername},
+            dataType: "text",
+            success: function(data) {
+                console.log(data);
+                if (data == 1)
+                    toolBar.superuser = true;
+                else
+                    toolBar.superuser = false;
+            }
+        });
+        
         annotool.toolBar = toolBar;
+        annotationHandler.annotool = annotool;
+        annotationHandler.toolbar = toolBar;
         toolBar.createButtons();
         
         //var panel = new panel();
         jQuery("#panel").hide();
+
         /*Pan and zoom to point*/
         var bound_x = <?php echo json_encode($_GET['x']); ?>;
         var bound_y = <?php echo json_encode($_GET['y']); ?>;
         var zoom = <?php echo json_encode($_GET['zoom']); ?> || 6;
-        /*
-        var savedFilters = [
-          {'name': 'Brightness', 'value': 100},
-          {'name': 'Erosion', 'value': 3},
-          {'name': 'Invert'}
-        ]
-
-        if (savedFilters) {
-          console.log('some filters are saved')
-          console.log(filteringtools)
-          filteringtools.showFilterControls();
-          for(var i=0; i<savedFilters.length; i++){
-                
-                console.log(i);
-                var f = savedFilters[i];
-                var filterName = f.name;
-                console.log(filterName);
-                jQuery("#"+filterName+"_add").click();
-                jQuery("#control"+filterName).val(f.value);
-                jQuery("#control"+filterName+"Num").val(f.value);
-            }
-        }*/
-
+        
         var stateID = <?php echo json_encode($_GET['stateID']); ?>;
 
         //Check if loading from saved state
@@ -273,18 +364,25 @@ function isAnnotationActive(){
         
         });
         }
+        
+        
+       // var zoom = <?php echo json_encode($_GET['zoom']); ?> || viewer.viewport.getMaxZoom();
 
+        //jQuery("#panel").hide();
+        jQuery("#weightpanel").hide();
+        jQuery("#markuppanel").hide();
+        jQuery("#switchuserpanel").hide();
         if(bound_x && bound_y){
             var ipt = new OpenSeadragon.Point(+bound_x, +bound_y);
             var vpt = viewer.viewport.imageToViewportCoordinates(ipt);
             viewer.viewport.panTo(vpt);
             viewer.viewport.zoomTo(zoom);
         } else {
-            //console.log("bounds not specified");
+            console.log("bounds not specified");
         }
     }
 
-      if (!String.prototype.format) {
+    if (!String.prototype.format) {
         String.prototype.format = function() {
             var args = arguments;
             return this.replace(/{(\d+)}/g, function(match, number) { 
@@ -294,12 +392,12 @@ function isAnnotationActive(){
             ;
             });
         };
-      }
+    }
 
     /*Zoom to location*/
     /*
         x: 19483.04157968738
-        y:nnnn22274.643967801494
+        y: 22274.643967801494
     */
     /*
         x: 13083.041579687379
@@ -320,4 +418,3 @@ function isAnnotationActive(){
 
 </body>
 </html>
-
