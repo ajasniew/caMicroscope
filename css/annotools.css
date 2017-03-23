@@ -36,6 +36,7 @@
         margin-right: 4px;
 }
 
+
 .selected2
 {
 	cursor: pointer;
@@ -264,10 +265,10 @@
     margin-right: 2px;
 }
 
-
 .controls {
 	color: #000;
 }
+
 #panel h4{
     color: #fff;
     font-family: Roboto;
@@ -307,7 +308,8 @@
     display: inline-block;
 }
 
-#panelBody input{
+
+#panelBody input, #panelBody textarea{
     color: #000;
 }
 #panael .btn2{
@@ -320,6 +322,9 @@
     font-size: 12px;
     padding: 4px 6px;
     margin: 8px 0px;
+}
+#panel .btn-danger{
+  background: #d9534f; 
 }
 #panelBody input.btn.btn-primary{
     background: #A2BA6F;
@@ -436,9 +441,7 @@
     -webkit-box-shadow: 0px 0px 5px 2px #000000;
     -moz-box-shadow: 0px 0px 5px 2px #000000;
     box-shadow: 0px 0px 5px 2px #000000;
-
 }
-
 .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio]{
 	margin: 0;
 }
@@ -451,7 +454,16 @@
     display: inline-block;
     top: 2px;
     margin: 2px;
+}
+#panelBody textarea{
+	height: 75px;
+}
+#panel a{
+  color: #fff;
+}
 
+.inactive{
+  opacity: 0.6
 }
 #panelBody label{
   margin-top: 10px;
@@ -468,4 +480,23 @@
   float: left;
   display:inline-block;
   //margin-top: -15px;
+}
+.inactive:hover{
+  opacity: 1;
+}
+
+.active{
+  opacity: 1;
+}
+
+.markupFeature{
+  margin-top: 5px;
+}
+.markupFeatureName{
+  display: block;
+  font-weight: 600;
+}
+
+input[type='radio'] {
+  transform: scale(1.4);
 }
