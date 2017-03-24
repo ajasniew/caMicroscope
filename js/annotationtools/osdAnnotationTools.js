@@ -26,6 +26,9 @@ var annotools = function (options) {
   this.annotVisible = true // The Annotations are Set to be visible at the First Loading
   this.mode = 'default' // The Mode is Set to Default
 
+  this.username = options.username; // Username from session variable
+  console.log(this.username);
+
   this.viewer = options.viewer
   this.imagingHelper = this.viewer.imagingHelper
   this.mpp = options.mpp
@@ -37,6 +40,154 @@ var annotools = function (options) {
   this.y2 = 1.0
 
   this.annotationHandler = options.annotationHandler || new AnnotoolsOpenSeadragonHandler()
+  // Added variables and event handler
+  //this.heatmap_opacity = 0.4;
+  //this.heatmapColor = ['#bd0026','#fd8d3c','#fecc5c','#feedde'];
+  this.marking_choice = 'LymPos';
+  //this.isLoadedWeight = false;
+  this.loadHeatmapWeight();
+  this.btn_revertWeight = document.getElementById('btn_revertWeight');
+  this.btn_saveWeight = document.getElementById('btn_saveHeatmapWeight');
+  this.btn_saveweight_help = document.getElementById('btn_heatmapweight_help');
+  this.rb_lymposbig = document.getElementById('LymPosBig');
+  this.rb_lymnegbig = document.getElementById('LymNegBig');
+  this.rb_lympos = document.getElementById('LymPos');
+  this.rb_lymneg = document.getElementById('LymNeg');
+  this.rb_tumpos = document.getElementById('TumorPos');
+  this.rb_tumneg = document.getElementById('TumorNeg');
+  this.rb_move = document.getElementById('rb_Moving');
+  this.rb_lymposbig.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_lymnegbig.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_lympos.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_lymneg.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_tumpos.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_tumneg.addEventListener('click', this.radiobuttonChange.bind(this), false);
+  this.rb_move.addEventListener('click', this.radiobuttonChange.bind(this), false);
+
+  this.btn_revertWeight.addEventListener('click', this.revertWeight.bind(this), false);
+  this.btn_saveWeight.addEventListener('click', this.saveHeatmapWeight.bind(this), false);
+  this.btn_saveweight_help.addEventListener('click', function(){alert('\
+This panel allows you to adjust the automatic lymphocyte prediction results for this slide, with the options described below.\n\n\
+Lymphocyte Sensitivity bar:\n       Ddjust the sensitivity of lymphocyte prediction.\n\
+       Choose a higher volume for more predicted lymphocyte regions\n\n\
+Necrosis Specificity bar:\n       Ddjust the specificity of necrosis prediction.\n\
+       Choose a higher volume for more predicted lymphocyte regions\n\n\
+Lymphocyte Prediction box:\n       Show lymphocyte prediction without necrosis filtering.\n\n\
+Necrosis Prediction box:\n       Show necrosis prediction.\n\n\
+Lym Prediction with Nec Filtering box:\n       Show lymphocyte prediction with necrosis filtering (recommended).\n\n\
+');}, false);
+
+  for (var su_i = 0; su_i <= 64; ++su_i) {
+      switch_user_eles = document.getElementById('switch_user_' + su_i.toString());
+      if (switch_user_eles != null) {
+          switch_user_eles.addEventListener('click', this.switchUserRadiobuttonChange.bind(this), false);
+      } else {
+          break;
+      }
+  }
+
+  this.btn_savemark_var = document.getElementById('btn_savemark');
+  this.btn_savemark_var.addEventListener('click', this.markSaveClick.bind(this), false);
+  this.btn_undomark_var = document.getElementById('btn_undomark');
+  this.btn_undomark_help_var = document.getElementById('btn_mark_help');
+  this.btn_undomark_var.addEventListener('click', this.undoStroke.bind(this), false);
+  this.btn_undomark_help_var.addEventListener('click', function(){alert('\
+This panel provides tools to manually mark lymphocyte/non-lymphocyte, tumor/non-tumor regions.\n\n\
+If you are unsatisfied with the lymphocyte prediction result, please polish it using options described below:\n\
+   LymPos (draw thin line):\n\
+       Draw lines across lymphocyte squares.\n\
+       After saved, squares crossed by the line\n\
+       will be marked as lymphocyte squares.\n\
+   LymNeg (draw thin line):\n\
+       Draw lines across non-lymphocyte squares.\n\
+       After saved, squares crossed by the line\n\
+       will be marked as non-lymphocyte squares.\n\
+   LymPos (draw thick line):\n\
+       Draw lines across lymphocyte squares.\n\
+       After saved, squares close to the line\n\
+       will be marked as lymphocyte squares.\n\
+   LymNeg (draw thick line):\n\
+       Draw lines across non-lymphocyte squares.\n\
+       After saved, squares close to the line\n\
+       will be marked as non-lymphocyte squares.\n\n\
+Please indicate tumor regions using options described below:\n\
+   TumorPos (draw polygon):\n\
+       Draw curves around tumor regions of this slide.\n\
+       Regions not included will be considered as non-tumor\n\
+       regions by default.\n\
+   TumorNeg (draw polygon):\n\
+       Draw curves around non-tumor regions of this slide.\n\
+       Note that you can draw curves around tumor regions\n\
+       using the TumorPos option, and regions not included in\n\
+       the TumorPos region will be considered as non-tumor by\n\
+       default. Therefore you do not have to use this option.\n\
+       Nevertheless, you can use this option to overwrite\n\
+       regions you previously masked as tumor regions to\n\
+       non-tumor regions.\n\n\
+To save/cancel your work, use the buttons described below:\n\
+   Save then Move Around:\n\
+       Save all markings and switch to the navigation\n\
+       mode (Zoom in/out, move the slide around).\n\
+   Save:\n\
+       Save all markings, and continue to mark.\n\
+   Cancel:\n\
+       Cancel the most recent, unsaved marking.\n\
+       To change saved markings, you can simply\n\
+       overwrite them by drawing new markings.\
+');}, false);
+
+  this.heatmap_opacity = 0.4;
+  this.heatmapColor = ['#feedde','#fecc5c','#fd8d3c','#bd0026', '#33b5ff'];
+  this.multipleHeatmapColor = [];
+  this.cb_checked = [false, false, false];
+  this.heat_weight = [0.5, 0.5, 0.0];
+  this.prev_heat_weight = [0.5, 0.5, 0.0];
+  this.loadedWeight = false;
+  //this.loadHeatmapWeight();
+  bar_var1 = document.getElementById('bar1');
+  bar_var2 = document.getElementById('bar2');
+  bar_var3 = document.getElementById('bar3');
+  slide_var1 = document.getElementById('slide1');
+  slide_var2 = document.getElementById('slide2');
+  slide_var3 = document.getElementById('slide3');
+  cb1 = document.getElementById('cb1');
+  cb2 = document.getElementById('cb2');
+  cb3 = document.getElementById('cb3');
+  bar_click = 0;    // 0: no bar is clicked, 1: bar_1 is clicked, 2: bar_2 is clicked, 3: bar_3 is clicked
+
+  bar_var1.addEventListener('mousedown', this.barMouseDown, false);
+  bar_var1.addEventListener('mouseup', this.barMouseUp.bind(this), false);
+  bar_var1.addEventListener('mousemove', this.barMouseSlide, false);
+  bar_var1.addEventListener('mouseleave', this.barMouseUp.bind(this), false);
+
+  bar_var2.addEventListener('mousedown', this.barMouseDown, false);
+  bar_var2.addEventListener('mouseup', this.barMouseUp.bind(this), false);
+  bar_var2.addEventListener('mousemove', this.barMouseSlide, false);
+  bar_var2.addEventListener('mouseleave', this.barMouseUp.bind(this), false);
+
+  bar_var3.addEventListener('mousedown', this.barMouseDown, false);
+  bar_var3.addEventListener('mouseup', this.barMouseUp.bind(this), false);
+  bar_var3.addEventListener('mousemove', this.barMouseSlide, false);
+  bar_var3.addEventListener('mouseleave', this.barMouseUp.bind(this), false);
+
+  cb1.addEventListener('change', this.checkboxChange.bind(this), false);
+  cb2.addEventListener('change', this.checkboxChange.bind(this), false);
+  cb3.addEventListener('change', this.checkboxChange.bind(this), false);
+
+  // Markup line width
+  this.markupline_width = 1;
+
+  // Added code for temp radio box on weights
+  var lymse = document.getElementById('LymSe');
+  var necse = document.getElementById('NecSe');
+  var bothse = document.getElementById('BothSe');
+  lymse.addEventListener('change', this.lymnecWeightChange.bind(this), false);
+  necse.addEventListener('change', this.lymnecWeightChange.bind(this), false);
+  bothse.addEventListener('change', this.lymnecWeightChange.bind(this), false);
+  cb1.style.visibility = "hidden";
+  cb2.style.visibility = "hidden";
+  cb3.style.visibility = "hidden";
+
   /*
    * OpenSeaDragon events
    */
@@ -92,6 +243,7 @@ var annotools = function (options) {
       'z-index': 1
     }
   }).inject(document.body) // drawLayer will hide by default
+  //this.drawLayer.bind('keydown', this.keyPress);
 
   // this.drawCanvas = jQuery('<canvas></canvas>')
   // this.drawCanvas.css({"position": "absolute", "z-index": 1})
@@ -164,6 +316,7 @@ annotools.prototype.renderByExecutionId = function(algorithms){
   } 
 }
 
+
 annotools.prototype.getMultiAnnot = function (viewer) {
   var opa = []
 
@@ -187,7 +340,10 @@ annotools.prototype.getMultiAnnot = function (viewer) {
     }
   }
   */
-
+    
+  //console.log(algorithms);
+  //console.log(this.imagingHelper._viewportWidth);
+  //console.log(this.imagingHelper._viewportHeight);
   var self = this
   this.x1 = this.imagingHelper._viewportOrigin['x']
   this.y1 = this.imagingHelper._viewportOrigin['y']
@@ -202,15 +358,17 @@ annotools.prototype.getMultiAnnot = function (viewer) {
   var boundY = boundX
 
   var max = new OpenSeadragon.Point(this.imagingHelper.physicalToDataX(3), this.imagingHelper.physicalToDataY(3))
+  //var max = new OpenSeadragon.Point(this.imagingHelper.physicalToDataX(9), this.imagingHelper.physicalToDataY(9))
   var origin = new OpenSeadragon.Point(this.imagingHelper.physicalToDataX(0), this.imagingHelper.physicalToDataY(0))
   var area = (max.x - origin.x) * (max.y - origin.y)
-
+  //algorithms.push('test')
 
   var t1 = 0
   if (algorithms.length) {
     this.toolBar.titleButton.hide()
     this.toolBar.ajaxBusy.show()
     this.annotations = this.AnnotationStore.fetchAnnotations(this.x1 - 0.1, this.y1 - 0.1, this.x2, this.y2, area, algorithms, function (data) {
+    //this.annotations = this.AnnotationStore.fetchAnnotations(this.x1, this.y1, this.x2, this.y2, area, algorithms, function (data) {
       // console.log(data)
       self.annotations = data
       self.displayGeoAnnots()
@@ -241,8 +399,9 @@ annotools.prototype.getAnnot = function (viewer) // Get Annotation from the API
   boundY2 = this.imagingHelper.physicalToLogicalY(20)
   var boundX = boundX1 - this.x1
   var boundY = boundX
-
+  
   var max = new OpenSeadragon.Point(this.imagingHelper.physicalToDataX(4), this.imagingHelper.physicalToDataY(4))
+  //var max = new OpenSeadragon.Point(this.imagingHelper.physicalToDataX(9), this.imagingHelper.physicalToDataY(4))
   var origin = new OpenSeadragon.Point(this.imagingHelper.physicalToDataX(0), this.imagingHelper.physicalToDataY(0))
   var area = (max.x - origin.x) * (max.y - origin.y)
 
@@ -252,7 +411,8 @@ annotools.prototype.getAnnot = function (viewer) // Get Annotation from the API
     self.displayGeoAnnots()
     self.setupHandlers()
   // var t2 = performance.now()
-  // console.log("Performance: "+(t2-t1))
+  // console.log("Performance: "+(t2-t1)) 
+
   })
 }
 
@@ -297,6 +457,7 @@ annotools.prototype.getAnnotFilter = function (author, grade, multi) // Get Anno
 
 annotools.prototype.keyPress = function (code) // Key Down Events Handler
 {
+  console.log('enter keypress');
   switch (code) {
     case 84:
       // press t to toggle tools
@@ -343,6 +504,9 @@ annotools.prototype.keyPress = function (code) // Key Down Events Handler
       this.mode = 'magnify'
       this.magnify()
       break
+    case 81:
+      console.log('abc');
+      break;
   }
 }
 
@@ -371,6 +535,7 @@ annotools.prototype.drawMarkups = function () // Draw Markups
       owidth = width,
       oheight = height
     // console.log("left: " + left + " top: " + top + " width: " + width + " height: " + height)
+
     if (left < 0) {
       left = 0
       width = window.innerWidth
@@ -411,6 +576,9 @@ annotools.prototype.drawMarkups = function () // Draw Markups
         break
       case 'measure':
         this.drawMeasure(ctx)
+        break
+      case 'free_markup':
+        this.drawMarking(ctx)
         break
     }
   } else this.showMessage('Container Not SET Correctly Or Not Fully Loaded Yet')
@@ -613,8 +781,98 @@ annotools.prototype.createWorkOrder = function () {
     }.bind(this))
   }
 }
+//end copy
 
+/*
+annotools.prototype.drawMarkups= function () //Draw Markups
+{
+    this.showMessage() //Show Message
+    //this.drawCanvas.off()
+    this.removeMouseEvents()
+    //this.drawCanvas.removeEvents('mouseup')
+    //this.drawCanvas.removeEvents('mousedown')
+    //this.drawCanvas.removeEvents('mousemove')
+    this.drawLayer.show() //Show The Drawing Layer
+/* ASHISH Disable quit
+    this.quitbutton.show() //Show The Quit Button
 
+    this.magnifyGlass.hide() //Hide The Magnifying Tool
+    //this.container = document.id(this.canvas) //Get The Canvas Container
+    this.container = document.getElementsByClassName(this.canvas)[0] //Get The Canvas Container
+    //this.container = document.getElementById('container') //Get The Canvas Container
+    if (this.container) {
+        //var left = parseInt(this.container.offsetLeft), //Get The Container Location
+        var left = parseInt(this.container.getLeft()), //Get The Container Location
+            top = parseInt(this.container.offsetTop),
+            width = parseInt(this.container.offsetWidth),
+            height = parseInt(this.container.offsetHeight),
+            oleft = left,
+            otop = top,
+            owidth = width,
+            oheight = height
+        //console.log("left: " + left + " top: " + top + " width: " + width + " height: " + height)
+        if (left < 0) {
+            left = 0
+            width = window.innerWidth
+        } //See Whether The Container is outside The Current ViewPort
+        if (top < 0) {
+            top = 0
+            height = window.innerHeight
+        }
+        //Recreate The CreateAnnotation Layer Because of The ViewPort Change Issue.
+        //console.log(this.drawLayer)
+        this.drawLayer.css({
+                left: left,
+                top: top,
+                width: width,
+                height: height
+        })
+        /*
+        this.drawLayer.set({
+            'styles': {
+                left: left,
+                top: top,
+                width: width,
+                height: height
+            }
+        })
+
+        this.drawCanvas.css({
+            width: width, 
+            height: height
+        })
+        //Create Canvas on the CreateAnnotation Layer
+        /*
+        this.drawCanvas.set({
+            width: width,
+            height: height
+        })
+
+        //The canvas context
+        var ctx = this.drawCanvas[0].getContext("2d")
+        //console.log(this.mode)
+        //Draw Markups on Canvas
+        switch (this.mode) {
+            case "rect":
+                this.drawRectangle(ctx)
+        break
+            case "ellipse":
+                this.drawEllipse(ctx)
+        break
+            case "pencil":
+        this.drawPencil(ctx)
+        break
+            case "polyline":
+                this.drawPolyline(ctx)
+        break
+            case "measure":
+                this.drawMeasure(ctx)
+        break
+        }
+    } else this.showMessage("Container Not SET Correctly Or Not Fully Loaded Yet")
+    
+}
+*/
 annotools.prototype.magnify = function () // Magnify Tool
 {
   /* ASHISH Disable quit
@@ -800,10 +1058,40 @@ annotools.prototype.selectColor = function () // Pick A Color
 
 annotools.prototype.addnewAnnot = function (newAnnot) // Add New Annotations
 {
-
+  // console.log(this)
+  // newAnnot.iid = this.iid
+  // newAnnot.annotIdi = MD5(new Date().toString())
+  // console.log(newAnnot)
+  // this.annotations.push(newAnnot)
+  // console.log(this.annotations)
+  //console.log(newAnnot)
   this.saveAnnot(newAnnot)
+  // console.log("saved annotation")
+
   this.displayGeoAnnots()
 }
+
+annotools.prototype.addnewAnnot_Array = function (newAnnot_arr) // Add New Annotations
+{
+  for (i = 0; i< newAnnot_arr.length; i++) {
+      this.saveAnnot_noRefresh(newAnnot_arr[i]);
+  }
+  $(document).ajaxStop(function () {
+      // 0 === $.active
+      this.getMultiAnnot();
+      this.displayGeoAnnots();
+  });
+
+  // Sleep a while to have enough time for synchronization between web and database
+  var start = new Date().getTime();
+  var delay = 200;
+  while (new Date().getTime() < start + delay);
+
+
+  this.getMultiAnnot();
+  this.displayGeoAnnots();
+}
+
 /*ASHISH DIsable quit
 quitMode: function () //Return To the Default Mode
 {
@@ -1023,20 +1311,18 @@ annotools.prototype.relativeToGlobal = function () {
 }
 
 annotools.prototype.setupHandlers = function () {
-  console.log('setting up handlers')
+  //console.log('setting up handlers')
 
   var root = document.getElementsByTagName('svg')[0]
   // console.log(root); 
   if (root != undefined) {
     if (navigator.userAgent.toLowerCase().indexOf('webkit') >= 0) {
       window.addEventListener('mousewheel', this.annotationHandler.handleMouseWheel, false) // Chrome/Safari
-    // window.addEventListener('mousewheel',   this.getAnnot(), false) // Chrome/Safari
     } else {
       window.addEventListener('DOMMouseScroll', this.annotationHandler.handleMouseWheel, false) // Others
-    // window.addEventListener('DOMMouseScroll', this.getAnnot(), false) // Others
     }
-    // console.log(root)
     this.addMouseEvents()
+    window.addEventListener('keypress', this.annotationHandler.handleKeyPress, false)
   }
   // console.log("...")
   for (var i = 0; i < this.viewer.buttons.buttons.length; i++) {
@@ -1163,6 +1449,7 @@ annotools.prototype.updateAnnot = function (annot) // Save Annotations
 }
 annotools.prototype.saveAnnot = function (annotation) // Save Annotations
 {
+  var self = this;
   //console.log('Save annotation function')
   //console.log(annotation)
   jQuery.ajax({
@@ -1170,14 +1457,42 @@ annotools.prototype.saveAnnot = function (annotation) // Save Annotations
     url: 'api/Data/getAnnotSpatial.php',
     data: annotation,
     success: function (res, err) {
-      // console.log("response: ")
-      console.log(res)
-      console.log(err)
-
-      console.log('succesfully posted')
+      //console.log("response: ")
+      //console.log(res)
+      if(res == "unauthorized"){
+        alert("Error saving markup! Wrong secret");
+      } else {   
+        //alert("Successfully saved markup!");
+      }
+      //console.log(err)
+      self.getMultiAnnot();
+      //console.log('succesfully posted')
     }
   })
+}
 
+annotools.prototype.saveAnnot_noRefresh = function (annotation) // Save Annotations
+{
+  var self = this;
+  //console.log('Save annotation function')
+  //console.log(annotation)
+  jQuery.ajax({
+    'type': 'POST',
+    url: 'api/Data/getAnnotSpatial.php',
+    data: annotation,
+    success: function (res, err) {
+      console.log("response: ")
+      console.log(res)
+      if(res == "unauthorized"){
+        alert("Error saving markup! Wrong secret");
+      } else {
+        //alert("Successfully saved markup!");
+      }
+      //console.log(err)
+      //self.getMultiAnnot();
+      //console.log('succesfully posted')
+    }
+  })
 }
 
 annotools.prototype.convertToNative = function (annot) {
@@ -1276,6 +1591,44 @@ annotools.prototype.convertFromNative = function (annot, end) {
     var x_end = end.x
     var y_end = end.y
 
+
+    var nativeX_end = this.imagingHelper.physicalToLogicalX(x_end)
+    var nativeY_end = this.imagingHelper.physicalToLogicalY(y_end)
+
+    var nativeX = this.imagingHelper.physicalToLogicalX(x)
+    var nativeY = this.imagingHelper.physicalToLogicalY(y)
+    var nativeW = nativeX_end - nativeX
+    var nativeH = nativeY_end - nativeY
+    var nativePoints = points
+
+    var globalNumber = JSON.encode({nativeW: nativeW, nativeH: nativeH, nativeX: nativeX, nativeY: nativeY,points: nativePoints})
+
+    return globalNumber
+  }
+  else if (annot.type == 'pencil_mark') {
+    var x = annot.x
+    var y = annot.y
+    var w = annot.w
+    var h = annot.h
+    var point = annot.points
+    var poly_first_split = String.split(point, ' ')
+    var points = ''
+    for (var k = 0; k < poly_first_split.length - 1; k++) {
+      var poly_second_split = String.split(poly_first_split[k], ',')
+
+      var polyPoint = new OpenSeadragon.Point(parseFloat(poly_second_split[0]), parseFloat(poly_second_split[1]))
+
+      points += this.imagingHelper.physicalToLogicalX(polyPoint.x) + ',' + this.imagingHelper.physicalToLogicalY(polyPoint.y) + ' '
+    }
+
+    var last_poly_split = String.split(poly_first_split[k], ',')
+
+    var lastPolyPoint = new OpenSeadragon.Point(parseFloat(last_poly_split[0]), parseFloat(last_poly_split[1]))
+
+    points += this.imagingHelper.physicalToLogicalX(lastPolyPoint.x) + ',' + this.imagingHelper.physicalToLogicalY(lastPolyPoint.y)
+    var x_end = end.x
+    var y_end = end.y
+
     var nativeX_end = this.imagingHelper.physicalToLogicalX(x_end)
     var nativeY_end = this.imagingHelper.physicalToLogicalY(y_end)
     var nativeX = this.imagingHelper.physicalToLogicalX(x)
@@ -1283,6 +1636,13 @@ annotools.prototype.convertFromNative = function (annot, end) {
     var nativeW = nativeX_end - nativeX
     var nativeH = nativeY_end - nativeY
     var nativePoints = points
+
+    console.log(x_end);
+    console.log(nativeX_end);
+    console.log(nativeY_end);
+    //console.log(nativeX);
+    //console.log(nativeW);
+    //console.log(nativePoints);
 
     var globalNumber = JSON.encode({nativeW: nativeW, nativeH: nativeH, nativeX: nativeX, nativeY: nativeY,points: nativePoints})
 
@@ -1325,6 +1685,7 @@ annotools.prototype.drawEllipse = function (ctx) {
       y = startPosition.y
   })
   */
+
   this.drawCanvas.bind('mousemove', function (e) {
     if (started) {
       ctx.clearRect(0, 0, this.drawCanvas.width, this.drawCanvas.height)
@@ -1395,6 +1756,8 @@ annotools.prototype.drawRectangle = function (ctx) {
   console.log('drawing rectangle')
   jQuery('html,body').css('cursor', 'crosshair')
 
+  /*Highlight drawRectangle button and change cursor*/
+
   this.removeMouseEvents()
   var started = false
   var min_x,min_y,max_x,max_y,w,h
@@ -1432,6 +1795,7 @@ annotools.prototype.drawRectangle = function (ctx) {
     min_y = Math.min(finalMousePosition.y, startPosition.y)
     max_x = Math.max(finalMousePosition.x, startPosition.x)
     max_y = Math.max(finalMousePosition.y, startPosition.y)
+
     var startRelativeMousePosition = new OpenSeadragon.Point(min_x, min_y).minus(OpenSeadragon.getElementOffset(viewer.canvas))
     var endRelativeMousePosition = new OpenSeadragon.Point(max_x, max_y).minus(OpenSeadragon.getElementOffset(viewer.canvas))
     var newAnnot = {
@@ -1453,12 +1817,18 @@ annotools.prototype.drawRectangle = function (ctx) {
     var loc = []
     loc[0] = parseFloat(newAnnot.x)
     loc[1] = parseFloat(newAnnot.y)
-    newAnnot.loc = loc
+    newAnnot.loc = loc;
+
+    console.log(newAnnot);
 
     // convert to geojson 
     var geoNewAnnot = this.convertRectToGeo(newAnnot)
     // geoNewAnnot = newAnnot
-    this.promptForAnnotation(geoNewAnnot, 'new', this, ctx)
+    this.promptForAnnotation(geoNewAnnot, 'new', this, ctx);
+    jQuery("canvas").css("cursor", "default");
+    jQuery("#drawRectangleButton").removeClass("active");
+
+
   }.bind(this))
 }
 
@@ -1467,6 +1837,12 @@ annotools.prototype.drawPencil = function (ctx) {
   var started = false
   var pencil = []
   var newpoly = []
+
+  /*Change button and cursor*/
+  jQuery("canvas").css("cursor", "crosshair");
+  //jQuery("#drawFreelineButton").css("opacity", 1);
+  /**/
+
   this.drawCanvas.addEvent('mousedown', function (e) {
     started = true
     var startPoint = OpenSeadragon.getMousePosition(e.event)
@@ -1521,7 +1897,6 @@ annotools.prototype.drawPencil = function (ctx) {
       points = points.slice(0, -1)
       points += ';'
     }
-
     points = points.slice(0, -1)
 
     var newAnnot = {
@@ -1547,8 +1922,13 @@ annotools.prototype.drawPencil = function (ctx) {
     newAnnot.loc = loc
     //console.log(newAnnot)
     var geojsonAnnot = this.convertPencilToGeo(newAnnot)
-
     this.promptForAnnotation(geojsonAnnot, 'new', this, ctx)
+
+    /* Change button back to inactive*/
+    jQuery("canvas").css("cursor", "default");
+    jQuery("#drawFreelineButton").removeClass("active");
+    console.log('end of mouse up');
+
   }.bind(this))
 }
 
@@ -1805,6 +2185,43 @@ annotools.prototype.retrieveSingleAnnot = function (annotId) {
 
   return jsonReturn
 }
+annotools.prototype.populateForm = function (annotationTemplateJson, annotationTextJson, mode) {
+  var form = ''
+  for (var key in annotationTemplateJson) {
+    if (annotationTemplateJson.hasOwnProperty(key) && key != '_id') {
+      form += "<p class='labelText'>" + key + ': </p>'
+      var val = annotationTemplateJson[key]
+      if (val == 'text') {
+        form += "<input type='text' size='45' name='" + key + "' id='" + key + "'"
+        if (mode == 'edit') {
+          form += " value='" + annotationTextJson[key] + "'"
+        }
+        form += '\><br \>'
+      } else {
+        var options = val['enumerable'].replace(/ /g, '').split(',')
+        if (val['multi'] == 'true' && mode != 'filter') {
+          for (var i = 0; i < options.length; i++) {
+            form += "<input type='checkbox' name='" + key + "' id='" + options[i] + "' value='" + options[i] + "'"
+            if (mode == 'edit' && annotationTextJson[key].indexOf(options[i])) {
+              form += " checked='true'"
+            }
+            form += '>' + options[i] + '</input>'
+          }
+        } else {
+          for (var i = 0; i < options.length; i++) {
+            form += "<input type='radio' name='" + key + "' id='" + options[i] + "' value='" + options[i] + "'"
+            if (mode == 'edit' && annotationTextJson[key] == options[i]) {
+              form += " checked='true'"
+            }
+            form += '>' + options[i] + '</input>'
+          }
+        }
+      }
+    }
+  }
+  return form
+}
+
 function handleWorkOrder (annot) {
   console.log(annot)
 }
@@ -1882,7 +2299,6 @@ annotools.prototype.showFilterControls = function(newAnnot, mode, annotools, ctx
     })
 }
 */
-
 /*
 annotools.prototype.promptForWorkOrder = function (newAnnot, mode, annotools, ctx) {
   console.log(newAnnot)
@@ -2005,7 +2421,6 @@ annotools.prototype.promptForWorkOrder = function (newAnnot, mode, annotools, ct
 }
 */
 
-
 annotools.prototype.deleteAnnotations = function(execution_id, x1, y1, x2, y2){
   var body = {};
   var self = this;
@@ -2027,7 +2442,8 @@ annotools.prototype.deleteAnnotations = function(execution_id, x1, y1, x2, y2){
 };
 
 var execution_id; 
-var r = 1.0, w = 0.8, l=3.0, u = 10.0, k=20.0, j="N";  
+var r = 1.0, w = 0.8, l=3.0, u = 10.0, k=20.0, j="N"; 
+
 annotools.prototype.promptForWorkOrder = function (newAnnot, mode, annotools, ctx, roiGeoJSON) {
   jQuery('html,body').css('cursor', 'default')
 
@@ -2427,11 +2843,11 @@ function pollOrder(id, cb){
   });
 }
 
-
 annotools.prototype.promptForAnnotation = function (newAnnot, mode, annotools, ctx) {
   jQuery('#panel').show('slide')
   jQuery('html,body').css('cursor', 'default')
-  console.log(newAnnot)
+  console.log(newAnnot);
+  //jQuery('panel').html('');
   jQuery('#panel').html('' +
     "<div id = 'panelHeader'> <h4>Enter a new annotation </h4></div>"
     + "<div id='panelBody'>"
@@ -2441,6 +2857,7 @@ annotools.prototype.promptForAnnotation = function (newAnnot, mode, annotools, c
     + '</div>'
   )
   jQuery.get('api/Data/retrieveTemplate.php', function (data) {
+    console.log(data);
     var schema = JSON.parse(data)
     schema = JSON.parse(schema)[0]
     console.log(schema)
@@ -2470,7 +2887,7 @@ annotools.prototype.promptForAnnotation = function (newAnnot, mode, annotools, c
     formSchema.onSubmit = function (err, val) {
       // Add form data to annotation
       newAnnot.properties.annotations = val
-      console.log(newAnnot)
+
       // Post annotation
       annotools.addnewAnnot(newAnnot)
 
@@ -2478,6 +2895,7 @@ annotools.prototype.promptForAnnotation = function (newAnnot, mode, annotools, c
       jQuery('#panel').hide('slide')
       annotools.drawLayer.hide()
       annotools.addMouseEvents()
+
       return false
     }
 
@@ -2492,22 +2910,19 @@ annotools.prototype.promptForAnnotation = function (newAnnot, mode, annotools, c
   })
 }
 
-
 annotools.prototype.addMouseEvents = function () {
-  console.log('adding mouse events')
-
+  //console.log('adding mouse events')
+  // console.log(this.annotationHandler)
   window.addEventListener('mousemove', this.annotationHandler.handleMouseMove, false)
   window.addEventListener('mousedown', this.annotationHandler.handleMouseDown, false)
   window.addEventListener('mouseup', this.annotationHandler.handleMouseUp, false)
-
 }
 annotools.prototype.removeMouseEvents = function () {
-  console.log('removing events')
+  //console.log('removing events')
   // console.log(this.annotationHandler)
   window.removeEventListener('mousemove', this.annotationHandler.handleMouseMove, false)
   window.removeEventListener('mousedown', this.annotationHandler.handleMouseDown, false)
   window.removeEventListener('mouseup', this.annotationHandler.handleMouseUp, false)
-  
 // window.removeEventListener('mouseup',      this.getAnnot(), false)
 }
 
@@ -2834,3 +3249,227 @@ annotools.prototype.displayAnnot= function () //Display SVG Annotations
 *
 *
 */
+
+
+annotools.prototype.barMouseDown = function(event)
+{
+    if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+    {
+        return;
+    }
+
+    console.log('bar_mousedown');
+    console.log(bar_click);
+    console.log(event.target.id);
+    var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+    if (event.target.id == 'slide1' || event.target.id == 'bar1')
+    {
+        bar_click = 1;
+        //slide_var1.style.width = (set_perc * 100) + '%';
+        selected_slide = slide_var1;
+    }
+    else if (event.target.id == 'slide2' || event.target.id == 'bar2')
+    {
+        bar_click = 2;
+        selected_slide = slide_var2;
+    }
+    else
+    {
+        bar_click = 3;
+        selected_slide = slide_var3;
+    }
+
+    selected_slide.style.width = (set_perc * 100) + '%';
+}
+
+annotools.prototype.barMouseUp = function(event)
+{
+    if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+    {
+        return;
+    }
+
+    var self = this;
+    //console.log('bar_mouseup');
+    if (bar_click == 0)
+    {
+        return;
+    }
+    var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+    //this.prev_heat_weight[bar_click-1] = this.heat_weight[bar_click-1];
+    this.prev_heat_weight = this.heat_weight.slice();
+    this.heat_weight[bar_click-1] = set_perc;
+    console.log(set_perc);
+    bar_click = 0;
+    this.cb_checked[0] = document.getElementById('cb1').checked;
+    this.cb_checked[1] = document.getElementById('cb2').checked;
+    this.cb_checked[2] = document.getElementById('cb3').checked;
+    self.getMultiAnnot();
+}
+
+annotools.prototype.barMouseSlide = function(event)
+{
+    if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+    {
+        return;
+    }
+
+    if (bar_click != 0)
+    {
+        //console.log('bar_mouseslide');
+        var set_perc = ((((event.clientX - bar_var1.offsetLeft) / bar_var1.offsetWidth)).toFixed(2));
+        if (bar_click == 1)
+        {
+            slide_var1.style.width = (set_perc * 100) + '%';
+        }
+        else if (bar_click == 2)
+        {
+            slide_var2.style.width = (set_perc * 100) + '%';
+        }
+        else
+        {
+            slide_var3.style.width = (set_perc * 100) + '%';
+        }
+    }
+}
+
+annotools.prototype.checkboxChange = function(event)
+{
+    var self = this;
+    if (event.target.id == 'cb1')
+    {
+    }
+    else
+    {
+    }
+    self.getMultiAnnot();
+}
+
+// Added for temp weight boxes
+annotools.prototype.lymnecWeightChange = function(event)
+{
+        var self = this;
+        self.getMultiAnnot();
+}
+
+annotools.prototype.saveHeatmapWeight = function(event)
+{
+    var self = this;
+    console.log('enter save heatmap');
+    $.ajax({
+        type: "POST",
+        url: "php/save_weight.php",
+        data: {iid: self.iid, lymweight: this.heat_weight[0], necweight: this.heat_weight[1], smoothness: this.heat_weight[2], user: this.username},
+        dataType: "text",
+        success: function(data) {
+            console.log(data);
+            if (data.startsWith('Locked')) {
+                console.log('being locked');
+                alert ('This heatmap has been locked');
+            } else {
+                document.getElementById('div_weight_locked').innerHTML = 'Locked';
+                alert('Saved heatmap weights');
+            }
+        }
+    });
+}
+
+annotools.prototype.loadHeatmapWeight = function()
+{
+    var self = this;
+    console.log('Load heatmap weights');
+    console.log(self.iid);
+    $.ajax({
+        type: "POST",
+        url: "php/load_weight.php",
+        data: {iid: self.iid, user: this.username},
+        dataType: "text",
+        success: function(data) {
+            var sl1 = document.getElementById('slide1');
+            var sl2 = document.getElementById('slide2');
+            var sl3 = document.getElementById('slide3');
+            var div_lock = document.getElementById('div_weight_locked');
+            console.log(data);
+            if (!data.startsWith('NaN')) { 
+                parts = data.split('\n');
+                //arr = [parseFloat(parts[0]), parseFloat(parts[1])];
+                //var sl1 = document.getElementById('slide1');
+                //var sl2 = document.getElementById('slide2');
+                //var sl3 = document.getElementById('slide3');
+                var lym = (parseFloat(parts[0]) * 100).toString() + '%';
+                if (lym == 'NaN%') {
+                    lym = '50%';
+                }
+                var nec = (parseFloat(parts[1]) * 100).toString() + '%';
+                if (nec == 'NaN%') {
+                    nec = '50%';
+                }
+                var smh = (parseFloat(parts[2]) * 100).toString() + '%';
+                if (smh == 'NaN%') {
+                    smh = '0%';
+                }
+                sl1.style.width = lym;
+                sl2.style.width = nec;
+                sl3.style.width = smh;
+		this.prev_heat_weight = [lym, nec, smh];
+                div_lock.innerHTML = "Locked";
+                //var lym_f = parseFloat(lym.substring(0, lym.length)) / 100;
+                //var nec_f = parseFloat(nec.substring(0, nec.length)) / 100;
+                //var smh_f = parseFloat(smh.substring(0, smh.length)) / 100;
+                //this.heat_weight = [lym_f, nec_f, smh_f];
+                //console.log(this.heat_weight);
+                self.updateHeatVarFromSlideBar();
+            } else {
+                console.log('go else');
+                sl1.style.width = '50%';
+                sl2.style.width = '50%';
+                sl3.style.width = '0%';
+		this.prev_heat_weight = [0.5, 0.5, 0];
+                div_lock.innerHTML = "Free";
+            }
+        }
+    });
+
+    // Wait for the load weight transfering data
+    var start = new Date().getTime();
+    var delay = 200;
+    while (new Date().getTime() < start + delay);
+    console.log(document.getElementById('slide1').style.width);
+    console.log(document.getElementById('div_weight_locked').innerHTML);
+    self.getMultiAnnot();
+}
+
+annotools.prototype.updateHeatVarFromSlideBar = function()
+{
+    this.prev_heat_weight = this.heat_weight;
+    var sl1 = document.getElementById('slide1');
+    var sl2 = document.getElementById('slide2');
+    var sl3 = document.getElementById('slide3');
+    var lym = parseFloat(sl1.style.width.substring(0, sl1.style.width.length)) / 100;
+    var nec = parseFloat(sl2.style.width.substring(0, sl2.style.width.length)) / 100;
+    var smh = parseFloat(sl3.style.width.substring(0, sl3.style.width.length)) / 100;
+    this.heat_weight = [lym, nec, smh];
+}
+
+annotools.prototype.revertWeight = function(event)
+{
+    var self = this;
+    if (document.getElementById('div_weight_locked').innerHTML == 'Locked')
+    {
+        return;
+    }
+    console.log('revert weights');
+    var sl1 = document.getElementById('slide1');
+    var sl2 = document.getElementById('slide2');
+    var sl3 = document.getElementById('slide3');
+    var div_lock = document.getElementById('div_weight_locked');
+
+    console.log(this.prev_heat_weight);
+    sl1.style.width = this.prev_heat_weight[0]*100 + '%';
+    sl2.style.width = this.prev_heat_weight[1]*100 + '%';
+    sl3.style.width = this.prev_heat_weight[2]*100 + '%';
+    self.updateHeatVarFromSlideBar();
+
+    self.getMultiAnnot();
+
+}
