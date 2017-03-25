@@ -12,6 +12,8 @@ var ToolBar = function (element, options) {
 
   this.iid = options.iid || null
   this.annotationActive = isAnnotationActive()
+  
+  this.superuser = false;
 }
 ToolBar.prototype.showMessage = function (msg) {
   console.log(msg)
@@ -41,6 +43,9 @@ function goodalgo (data, status) {
     n.title = "<div class='colorBox' style='background:" + available_colors[i] + "'></div>" + data[i].title;
     n.key = i.toString()
     n.refKey = data[i].provenance.analysis_execution_id
+    if (n.refKey == 'lym_v3-high_res' || n.refKey == 'lym_v3-low_res' || n.refKey == 'humanmark') {
+      n.selected = true
+    }
     n.color = available_colors[i%7];
     //algorithm_color[data[i].provenance.analysis_execution_id] = available_colors[i%7]
     algorithm_color[data[i].provenance.analysis_execution_id] = available_colors[i%available_colors.length];
@@ -88,6 +93,17 @@ function goodalgo (data, status) {
       annotool.getMultiAnnot()
     }
   })
+  
+  // jQuery('#tree').attr('algotree', true)
+
+  // Load weight
+  if (annotool.loadedWeight == false) {
+      annotool.loadHeatmapWeight();
+      annotool.loadedWeight = true;
+  }
+
+
+  //annotool.getMultiAnnot()
 }
 var ALGORITHM_LIST = {};
 var SELECTED_ALGORITHM_LIST = [];
@@ -181,6 +197,21 @@ ToolBar.prototype.toggleAlgorithmSelector = function () {
   } 
   
 }
+
+
+ToolBar.prototype.setNormalMode = function() {
+  this.annotools.mode = 'normal';
+  jQuery("canvas").css("cursor", "default");
+  jQuery("#drawRectangleButton").removeClass('active');
+  jQuery("#drawFreelineButton").removeClass('active');
+  jQuery("#analyticsbutton").removeClass("active");   // Dot Tool
+  jQuery("#freeLineMarkupButton").removeClass("active");
+  jQuery("#markuppanel").hide();
+  jQuery("#switchuserpanel").hide();
+  this.annotools.drawLayer.hide()
+  this.annotools.addMouseEvents()       
+}
+
 
 ToolBar.prototype.createButtons = function () {
   // this.tool = jQ(this.source)
@@ -324,6 +355,98 @@ ToolBar.prototype.createButtons = function () {
       'src': 'images/partDownload.svg'
     })
     // tool.append(this.partialDownloadButton)  //Partial Download
+    
+    //lymphocyte project
+    this.spacer3 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer3)
+    
+    this.hidebutton = jQuery('<img>', {
+      'title': 'Show/Hide Markups',
+      'class': 'toolButton inactive',
+      'src': 'images/hide.svg'
+    })
+    tool.append(this.hidebutton)
+    
+    this.spacer3 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer3)
+
+    this.heatDownButton = jQuery('<img>', {
+        'title': 'Decrease opacity',
+        'class': 'toolButton inactive',
+        'src': 'images/Opacity_down.svg',
+        'id': 'heatDownButton',
+    });
+    tool.append(this.heatDownButton);     // Button for decreasing opacity
+
+    this.heatUpButton = jQuery('<img>', {
+        'title': 'Increase opacity',
+        'class': 'toolButton inactive',
+        'src': 'images/Opacity_up.svg',
+        'id': 'heatUpButton',
+    });
+    tool.append(this.heatUpButton);	// Button for increasing opacity
+      
+    this.spacer3 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer3)
+
+    this.colorMapButton = jQuery('<img>', {
+      'class': 'colorMapButton',
+      'title': 'ColorMap',
+      'src': 'images/colors.svg'
+    })
+    //tool.append(this.colorMapButton)
+
+    //this.spacer = jQuery('<img>', {
+    //  'class': 'spacerButton inactive',
+    //  'src': 'images/divider.svg'
+    //})
+    //tool.append(this.spacer)
+
+    this.showWeightPanel = jQuery('<img>', {
+        'title': 'Show weight panel',
+        'class': 'toolButton inactive',
+        'src': 'images/Heatmap.svg',
+        'id': 'showWeightPanel',
+    });
+    tool.append(this.showWeightPanel);    // Button for showing the weight panel
+      
+    this.spacer3 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer3)
+
+    this.freeMarkupButton = jQuery('<img>', {
+      'title': 'Free line Markup',
+      'class': 'toolButton inactive',
+      'src': 'images/pencil.svg',
+      'id': 'freeLineMarkupButton'
+    })
+    tool.append(this.freeMarkupButton) 	  // Markup Pencil Tool
+
+    this.spacer = jQuery('<img>', {
+      'class': 'spacerButton inactive',
+      'src': 'images/spacer_empty.svg'
+    })
+    tool.append(this.spacer)
+    
+    this.switchUserButton = jQuery('<img>', {
+        'title': 'Switch user',
+        'class': 'toolButton inactive',
+        'src': 'images/switch_user.svg',
+        'id': 'switchUserButton',
+    });
+    tool.append(this.switchUserButton);     // Button for decreasing opacity
+
 
     /*
      * Event handlers on click for the buttons
@@ -433,12 +556,85 @@ ToolBar.prototype.createButtons = function () {
     }.bind(this))
 
     this.analyticsbutton.on('click', function () {
-      this.annotools.createWorkOrder()
+      if(this.annotools.mode == 'analytics'){
+            this.setNormalMode();
+        } else {
+            //set analytics mode
+            this.annotools.mode = 'analytics'
+            this.annotools.createWorkOrder()
+            
+            jQuery("canvas").css("cursor", "crosshair");
+            jQuery("#drawRectangleButton").removeClass("active");
+            jQuery("#drawFreelineButton").removeClass("active");
+            jQuery("#freeLineMarkupButton").removeClass("active");
+            jQuery("#analyticsbutton").addClass("active");
+        }
     }.bind(this))
 
     this.filterImgButton.on('click', function () {
       this.FilterTools.showFilterControls()
     }.bind(this))
+    
+    //lymphocyte project start
+    this.heatUpButton.on('click', function () {
+        this.annotools.heatmap_opacity = Math.min(1, this.annotools.heatmap_opacity + 0.1);
+        this.annotools.getMultiAnnot();
+    }.bind(this))
+
+    this.heatDownButton.on('click', function () {
+        this.annotools.heatmap_opacity = Math.max(0, this.annotools.heatmap_opacity - 0.1);
+        this.annotools.getMultiAnnot();
+    }.bind(this))
+
+    this.switchUserButton.on('click', function () {
+        if (this.superuser) {
+            if (jQuery('#switchuserpanel').is(":visible"))
+                jQuery('#switchuserpanel').hide();
+            else
+                jQuery('#switchuserpanel').show();
+        } else {
+            alert("You are not a super user. A super user can review and change other people's annotations. To apply for the super user privilege. please contact Le Hou (le.hou@stonybrook.edu).");
+        }
+    }.bind(this))
+
+    this.showWeightPanel.on('click', function () {
+        console.log('click on showing weight panel');
+        if (jQuery('#weightpanel').is(":visible"))
+        {
+            jQuery('#weightpanel').hide();
+        }
+        else
+        {
+            console.log(this.annotools.heat_weight);
+            jQuery('#weightpanel').show();
+        }
+    }.bind(this))
+    
+    this.freeMarkupButton.on('click', function () {
+        if(this.annotools.mode == 'free_markup'){
+            this.setNormalMode();
+        } else {
+            //set pencil mode
+            this.annotools.mode = 'free_markup'
+            this.annotools.drawMarkups()
+
+            jQuery("canvas").css("cursor", "crosshair");
+            //jQuery("drawFreelineButton").css("opacity", 1);
+            jQuery("#drawRectangleButton").removeClass("active");
+            jQuery("#drawFreelineButton").removeClass("active");
+            jQuery("#analyticsbutton").removeClass("active");
+            jQuery("#freeLineMarkupButton").addClass("active");
+            jQuery("#markuppanel").show();
+ 
+            // Check if being on moving mode --> switch to drawing mode
+            if (document.getElementById("rb_Moving").checked) {
+                console.log('do switching');
+                document.getElementById('rb_Moving').checked = false;
+                document.getElementById('LymPos').checked = true;
+            }
+        }
+    }.bind(this))
+    //lymphocyte project end
 
     var toolButtons = jQuery('.toolButton')
     toolButtons.each(function () {
