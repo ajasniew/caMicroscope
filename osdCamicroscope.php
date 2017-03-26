@@ -29,6 +29,7 @@
   
   
         <!--JSON Form dependencies-->
+        <script src="/featurescapeapps/js/findapi_config.js" type="text/javascript"></script>
 
         <script type="text/javascript" src="js/dependencies/underscore.js">
             console.log(_);
@@ -39,7 +40,7 @@
         <script type="text/javascript" src="js/dependencies/jsv.js"></script>
         <!--End JSON Form dependencies -->
   
-        <script src="js/openseadragon/openseadragon-bin-2.0.0/openseadragon.js"></script>
+        <script src="js/openseadragon/openseadragon-bin-1.0.0/openseadragon.js"></script>
   
         <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>--> 
         <script src="js/openseadragon/openseadragon-imaginghelper.min.js"></script>
