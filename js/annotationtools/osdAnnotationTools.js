@@ -3376,6 +3376,7 @@ annotools.prototype.saveHeatmapWeight = function(event)
 
 annotools.prototype.loadHeatmapWeight = function()
 {
+    /*
     var self = this;
     console.log('Load heatmap weights');
     console.log(self.iid);
@@ -3437,6 +3438,7 @@ annotools.prototype.loadHeatmapWeight = function()
     console.log(document.getElementById('slide1').style.width);
     console.log(document.getElementById('div_weight_locked').innerHTML);
     self.getMultiAnnot();
+    */
 }
 
 annotools.prototype.updateHeatVarFromSlideBar = function()
