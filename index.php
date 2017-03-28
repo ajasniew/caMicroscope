@@ -121,8 +121,8 @@ $_SESSION["name"] = "quip";
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4"><a class="btn btn-info btn-block" href="http://129.49.249.167/camicroscope_lymphocyte/osdCamicroscope.php?tissueId=test1" data-toggle="tooltip" data-placement="bottom" title="Access caMicroscope">caMicroscope (Lymphocyte)</a></div>
-                    <div class="col-md-8">You can view whole slide tissue images and nuclear segmentations. Click on the magnifier icon to choose algorithm results. <b>You may zoom in, zoom out, and pan the images. Mouse Click: Zoom in, Shift-Click: Zoom out.</b></div>
+                    <div class="col-md-4"><a class="btn btn-info btn-block" href="http://129.49.249.167/camicroscope_lymphocyte/osdCamicroscope.php?tissueId=test1" data-toggle="tooltip" data-placement="bottom" title="Access caMicroscope">Lymphocyte and Plasma Cell Annotation</a></div>
+                    <div class="col-md-8">Semi-automatic Lymphocyte and Plasma Cell Annotation. Click on the magnifier icon to choose algorithm results. <b>You may zoom in, zoom out, and pan the images. Mouse Click: Zoom in, Shift-Click: Zoom out.</b></div>
                 </div>
                 <div class="row"><br /></div>
             </div>
