@@ -24,6 +24,8 @@ return array(
     'deleteMarkups' => "$annotationsUrl/MarkupLoader/delete/deleteMultipleMarkups",
     'postAnnotation' => "$annotationsUrl/MarkupLoader/submit/json",
     'getROI' => "$annotationsUrl/MarkupLoader/query/getROI",
+    
+    'postAlgorithmForImage' => "$annotationsUrl/MarkupsForImages/submit/json",
 
     /* Image */
     'getDimensions' => "$imageUrl/query/getDimensionsByIID?api_key=",
