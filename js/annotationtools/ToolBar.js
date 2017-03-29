@@ -264,6 +264,14 @@ ToolBar.prototype.createButtons = function () {
 			title: 'Home'
 		});
 		tool.append(this.homebutton);
+    
+    this.lymphbutton = jQuery('<img>', {
+			src: 'images/Heatmap.svg',
+			class: 'toolButton inactive',
+			title: 'Semi-automatic Lymphocyte and Plasma Cell Annotation'
+    });
+    tool.append(this.lymphbutton);
+      
     this.rectbutton = jQuery('<img>', {
       title: 'Draw Rectangle',
       id: 'drawRectangle',
@@ -454,6 +462,11 @@ ToolBar.prototype.createButtons = function () {
 		this.homebutton.on('click', function(){
 			window.location.href = "/";
 		});
+     
+    this.lymphbutton.on('click', function () {
+      window.location.href = "/lymphocyte/osdCamicroscope.php?tissueId="+this.iid;
+    }.bind(this))
+
     this.rectbutton.on('click', function () {
       this.mode = 'rect'
       this.annotools.mode = 'rect'
