@@ -26,7 +26,9 @@ ToolBar.prototype.algorithmSelector = function () {
   xxx = []
 }
 
-var available_colors = ['lime', 'red', 'blue', 'orange']
+//var available_colors = ['lime', 'red', 'blue', 'orange']
+var available_colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928'];
+
 var algorithm_color = {}
 
 function goodalgo (data, status) {
@@ -204,20 +206,57 @@ ToolBar.prototype.createButtons = function () {
      * Ganesh
      * Mootools to Jquery for creation of toolbar buttons
      */
-
+    this.homebutton = jQuery('<img>', {
+        src: 'images/ic_home_white_24px.svg',
+        class: 'toolButton firstToolButtonSpace inactive',
+        title: 'Home'
+    });
+    tool.append(this.homebutton);
+      
+    this.micbutton = jQuery('<img>', {
+        src: 'images/home_rest.png',
+        class: 'toolButton inactive',
+        title: 'caMicroscope'
+    });
+    tool.append(this.micbutton);
+      
+    this.spacer1 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer1)
+    
+    this.spacer2 = jQuery('<img>', {
+      'class': 'spacerButton inactive',
+      'src': 'images/spacer_empty.svg'
+    })
+    tool.append(this.spacer2)
+      
     this.filterbutton = jQuery('<img>', {
       'title': 'Filter Markups',
       'class': 'toolButton inactive',
       'src': 'images/filter.svg'
     })
     tool.append(this.filterbutton) // Filter Button
-
+    
+    this.spacer3 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer3)
+      
     this.hidebutton = jQuery('<img>', {
       'title': 'Show/Hide Markups',
       'class': 'toolButton inactive',
       'src': 'images/hide.svg'
     })
     tool.append(this.hidebutton)
+    
+    this.spacer4 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer4)
 
     this.heatDownButton = jQuery('<img>', {
         'title': 'Decrease opacity',
@@ -234,13 +273,19 @@ ToolBar.prototype.createButtons = function () {
         'id': 'heatUpButton',
     });
     tool.append(this.heatUpButton);	// Button for increasing opacity
+      
+    this.spacer5 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer5)
 
     this.colorMapButton = jQuery('<img>', {
       'class': 'colorMapButton',
       'title': 'ColorMap',
       'src': 'images/colors.svg'
     })
-    tool.append(this.colorMapButton)
+    //tool.append(this.colorMapButton)
 
     //this.spacer = jQuery('<img>', {
     //  'class': 'spacerButton inactive',
@@ -255,6 +300,12 @@ ToolBar.prototype.createButtons = function () {
         'id': 'showWeightPanel',
     });
     tool.append(this.showWeightPanel);    // Button for showing the weight panel
+      
+    this.spacer6 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer6)
 
     this.freeMarkupButton = jQuery('<img>', {
       'title': 'Free line Markup',
@@ -264,11 +315,11 @@ ToolBar.prototype.createButtons = function () {
     })
     tool.append(this.freeMarkupButton) 	  // Markup Pencil Tool
 
-    this.spacer = jQuery('<img>', {
-      'class': 'spacerButton inactive',
-      'src': 'images/spacer_empty.svg'
+    this.spacer7 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
     })
-    tool.append(this.spacer)
+    tool.append(this.spacer7)
     
     this.switchUserButton = jQuery('<img>', {
         'title': 'Switch user',
@@ -277,14 +328,28 @@ ToolBar.prototype.createButtons = function () {
         'id': 'switchUserButton',
     });
     tool.append(this.switchUserButton);     // Button for decreasing opacity
+      
+    this.spacer8 = jQuery('<img>', {
+      'class': 'spacerButton',
+      'src': 'images/spacer.svg'
+    })
+    tool.append(this.spacer8)
 
     /*
      * Event handlers on click for the buttons
      */
+    this.homebutton.on('click', function(){
+        window.location.href = "/";
+    }.bind(this))
+    
+    this.micbutton.on('click', function(){
+        window.location.href = "/camicroscope/osdCamicroscope.php?tissueId=" + this.iid;
+    }.bind(this))
+    
     this.hidebutton.on('click', function () {
       this.annotools.toggleMarkups()
     }.bind(this))
-
+    
     this.filterbutton.on('click', function () {
       this.toggleAlgorithmSelector()
     // this.removeMouseEvents()
@@ -397,15 +462,23 @@ ToolBar.prototype.createButtons = function () {
 
   this.titleButton = jQuery('<p>', {
     'class': 'titleButton',
-    'text': 'caMicroscope'
+    'text': 'caMicroscope Lymphocyte'
   })
   tool.append(this.titleButton)
-
+  
+  this.iidbutton = jQuery('<p>', {
+    'class': 'iidButton',
+    'text': 'Image Id: ' + this.iid
+  })
+  tool.append(this.iidbutton)
+  
+  /*
   this.iidbutton = jQuery('<p>', {
     'class': 'iidButton',
     'text': 'SubjectID :' + this.iid
   })
   tool.append(this.iidbutton)
+  */
 
   /* ASHISH - disable quit button
       this.quitbutton = new Element('img', {
