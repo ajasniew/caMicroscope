@@ -25,7 +25,7 @@ return array(
     'postAnnotation' => "$annotationsUrl/MarkupLoader/submit/json",
     'getROI' => "$annotationsUrl/MarkupLoader/query/getROI",
     
-    'postAlgorithmForImage' => "$annotationsUrl/MarkupsForImages/submit/json",
+    'postAlgorithmForImage' => "$annotationsUrl/MarkupsForImages/submit/json?",
 
     /* Image */
     'getDimensions' => "$imageUrl/query/getDimensionsByIID?api_key=",
