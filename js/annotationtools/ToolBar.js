@@ -20,44 +20,43 @@ ToolBar.prototype.showMessage = function (msg) {
   console.log(msg)
 }
 
+//start
 ToolBar.prototype.algorithmSelector = function () {
   var self = this
   var ftree
   xxx = []
 }
 
-//var available_colors = ['lime', 'red', 'blue', 'orange']
-var available_colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928'];
 
+//var available_colors = ['lime', 'red', 'blue', 'orange','lime', 'red', 'blue', 'orange','lime', 'red', 'blue', 'orange']
+var available_colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928'];
 var algorithm_color = {}
 
 function goodalgo (data, status) {
-  // console.log(data)
+   console.log("goodalgo data is: "+data);
+   console.log("data.length is: "+data.length)
   
-  /*
-  data.push({
-
-    "title": "Human Test",
-    "provenance": {
-      "analysis_execution_id": "humantest"
-    }
-  });
-  */  
+  
   var blob = []
   for (i = 0;i < data.length;i++) {
     var n = {}
     //console.log(data[i])
-    n.title = "<div class='colorBox' style='background:" + available_colors[i] + "'></div>" + data[i].title
+    data[i].title=data[i].provenance.analysis_execution_id;
+    
+    n.title = "<div class='colorBox' style='background:" + available_colors[i] + "'></div>" + data[i].title;
     n.key = i.toString()
     n.refKey = data[i].provenance.analysis_execution_id
     if (n.refKey == 'lym_v3-high_res' || n.refKey == 'lym_v3-low_res' || n.refKey == 'humanmark') {
       n.selected = true
     }
-
-    n.color = available_colors[i]
-    algorithm_color[data[i].provenance.analysis_execution_id] = available_colors[i]
+    n.color = available_colors[i%7];
+    //algorithm_color[data[i].provenance.analysis_execution_id] = available_colors[i%7]
+    algorithm_color[data[i].provenance.analysis_execution_id] = available_colors[i%available_colors.length];
     blob.push(n)
   }
+  
+  console.log("blob : "+blob);
+  
   ftree = jQuery('#tree').fancytree({
     source: [{
       title: 'Algorithms', key: '1', folder: true,
@@ -97,21 +96,24 @@ function goodalgo (data, status) {
 
       console.log('!SELECTED NODE : ' + node.title)
       targetType = data.targetType
-      console.log(node);
       annotool.getMultiAnnot()
     }
   })
-  jQuery('#tree').attr('algotree', true)
+  //aj start
+  //jQuery('#tree').attr('algotree', true)
 
   // Load weight
   if (annotool.loadedWeight == false) {
       annotool.loadHeatmapWeight();
       annotool.loadedWeight = true;
   }
-
-
-  annotool.getMultiAnnot()
+  //annotool.getMultiAnnot()
+  //aj end
 }
+//end
+
+
+
 
 ToolBar.prototype.toggleAlgorithmSelector = function () {
   if (!jQuery('#algosel').attr('eb')) {
