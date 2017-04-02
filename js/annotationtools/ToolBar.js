@@ -20,43 +20,45 @@ ToolBar.prototype.showMessage = function (msg) {
   console.log(msg)
 }
 
-//start
 ToolBar.prototype.algorithmSelector = function () {
   var self = this
   var ftree
   xxx = []
 }
 
-
-//var available_colors = ['lime', 'red', 'blue', 'orange','lime', 'red', 'blue', 'orange','lime', 'red', 'blue', 'orange']
+//var available_colors = ['lime', 'red', 'blue', 'orange']
 var available_colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928'];
 var algorithm_color = {}
 
 function goodalgo (data, status) {
-   console.log("goodalgo data is: "+data);
-   console.log("data.length is: "+data.length)
+  // console.log(data)
   
-  
+  /*
+  data.push({
+
+    "title": "Human Test",
+    "provenance": {
+      "analysis_execution_id": "humantest"
+    }
+  });
+  */  
   var blob = []
   for (i = 0;i < data.length;i++) {
     var n = {}
     //console.log(data[i])
     data[i].title=data[i].provenance.analysis_execution_id;
-    
-    n.title = "<div class='colorBox' style='background:" + available_colors[i] + "'></div>" + data[i].title;
+    n.title = "<div class='colorBox' style='background:" + available_colors[i] + "'></div>" + data[i].title
     n.key = i.toString()
     n.refKey = data[i].provenance.analysis_execution_id
     if (n.refKey == 'lym_v3-high_res' || n.refKey == 'lym_v3-low_res' || n.refKey == 'humanmark') {
       n.selected = true
     }
-    n.color = available_colors[i%7];
-    //algorithm_color[data[i].provenance.analysis_execution_id] = available_colors[i%7]
+
+    //n.color = available_colors[i]
+    //algorithm_color[data[i].provenance.analysis_execution_id] = available_colors[i]
     algorithm_color[data[i].provenance.analysis_execution_id] = available_colors[i%available_colors.length];
     blob.push(n)
   }
-  
-  console.log("blob : "+blob);
-  
   ftree = jQuery('#tree').fancytree({
     source: [{
       title: 'Algorithms', key: '1', folder: true,
@@ -96,24 +98,21 @@ function goodalgo (data, status) {
 
       console.log('!SELECTED NODE : ' + node.title)
       targetType = data.targetType
+      console.log(node);
       annotool.getMultiAnnot()
     }
   })
-  //aj start
-  //jQuery('#tree').attr('algotree', true)
+  jQuery('#tree').attr('algotree', true)
 
   // Load weight
   if (annotool.loadedWeight == false) {
       annotool.loadHeatmapWeight();
       annotool.loadedWeight = true;
   }
-  //annotool.getMultiAnnot()
-  //aj end
+
+
+  annotool.getMultiAnnot()
 }
-//end
-
-
-
 
 ToolBar.prototype.toggleAlgorithmSelector = function () {
   if (!jQuery('#algosel').attr('eb')) {
@@ -208,7 +207,8 @@ ToolBar.prototype.createButtons = function () {
      * Ganesh
      * Mootools to Jquery for creation of toolbar buttons
      */
-    this.homebutton = jQuery('<img>', {
+    // docker intergration start
+     this.homebutton = jQuery('<img>', {
         src: 'images/ic_home_white_24px.svg',
         class: 'toolButton firstToolButtonSpace inactive',
         title: 'Home'
@@ -233,7 +233,8 @@ ToolBar.prototype.createButtons = function () {
       'src': 'images/spacer_empty.svg'
     })
     tool.append(this.spacer2)
-      
+    // docker integration end
+
     this.filterbutton = jQuery('<img>', {
       'title': 'Filter Markups',
       'class': 'toolButton inactive',
@@ -318,7 +319,7 @@ ToolBar.prototype.createButtons = function () {
     tool.append(this.freeMarkupButton) 	  // Markup Pencil Tool
 
     this.spacer7 = jQuery('<img>', {
-      'class': 'spacerButton',
+      'class': 'spacerButton inactive',
       'src': 'images/spacer.svg'
     })
     tool.append(this.spacer7)
@@ -351,7 +352,7 @@ ToolBar.prototype.createButtons = function () {
     this.hidebutton.on('click', function () {
       this.annotools.toggleMarkups()
     }.bind(this))
-    
+
     this.filterbutton.on('click', function () {
       this.toggleAlgorithmSelector()
     // this.removeMouseEvents()
@@ -467,20 +468,12 @@ ToolBar.prototype.createButtons = function () {
     'text': 'caMicroscope Lymphocyte'
   })
   tool.append(this.titleButton)
-  
+
   this.iidbutton = jQuery('<p>', {
     'class': 'iidButton',
     'text': 'Image Id: ' + this.iid
   })
   tool.append(this.iidbutton)
-  
-  /*
-  this.iidbutton = jQuery('<p>', {
-    'class': 'iidButton',
-    'text': 'SubjectID :' + this.iid
-  })
-  tool.append(this.iidbutton)
-  */
 
   /* ASHISH - disable quit button
       this.quitbutton = new Element('img', {
