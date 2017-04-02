@@ -19,12 +19,11 @@ return array(
     'auth_realm' => "$baseUrl/securityTokenService",
     /* Markups */
     'algorithmsForImage' => "$annotationsUrl/MarkupsForImages/query/MarkupsAvilableForImage?",
-    //'getMultipleAnnotations' => "$annotationsUrl/MarkupLoader/query/getMultipleMarkups?",
-    'getMultipleAnnotations' => "$markupUrl/query/getMultipleMarkupsWithAttr?",
+    //'getMultipleAnnotations' => "$annotationsUrl/MarkupLoader/query/getMultipleMarkupsWithAttr?",
+    'getMultipleAnnotations' => "$annotationsUrl/MarkupLoader/query/getMultipleMarkups?",
     'deleteMarkups' => "$annotationsUrl/MarkupLoader/delete/deleteMultipleMarkups",
     'postAnnotation' => "$annotationsUrl/MarkupLoader/submit/json",
     'getROI' => "$annotationsUrl/MarkupLoader/query/getROI",
-    
     'postAlgorithmForImage' => "$annotationsUrl/MarkupsForImages/submit/json?",
 
     /* Image */
