@@ -180,7 +180,7 @@
             },
             "attribute": {
               "name": "attribute",
-              "required": true,
+              "required": false,
               "defaultValue": "",
               "description": ""
             }
