@@ -50,7 +50,7 @@ function goodalgo (data, status) {
     n.title = "<div class='colorBox' style='background:" + available_colors[i] + "'></div>" + data[i].title
     n.key = i.toString()
     n.refKey = data[i].provenance.analysis_execution_id
-    if (n.refKey == 'lym_v3-high_res' || n.refKey == 'lym_v3-low_res' || n.refKey == 'humanmark') {
+    if (n.refKey == 'lym_v6-high_res' || n.refKey == 'lym_v6-low_res' || n.refKey == 'humanmark') {
       n.selected = true
     }
 
