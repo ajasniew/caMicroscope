@@ -317,7 +317,18 @@ annotools.prototype.generateSVG = function (annotations) {
         if (annotation.properties.annotations.username != this.username)
             continue;
       }
-
+ 
+      if (this.lymheat == false)
+      {
+	    if ((annotation.object_type == 'marking') && (annotation.properties.annotations.mark_type == 'LymPos' || annotation.properties.annotations.mark_type == 'LymNeg'))
+	    {
+		  continue;
+	    }
+	    if (annotation.object_type == 'heatmap' || annotation.object_type == 'heatmap_multiple')
+	    {
+		  continue;
+	    }
+      }
 
       var id = '';
       
