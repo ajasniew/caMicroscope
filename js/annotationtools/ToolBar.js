@@ -223,16 +223,10 @@ ToolBar.prototype.createButtons = function () {
     tool.append(this.micbutton);
       
     this.spacer1 = jQuery('<img>', {
-      'class': 'spacerButton',
-      'src': 'images/spacer.svg'
-    })
-    tool.append(this.spacer1)
-    
-    this.spacer2 = jQuery('<img>', {
       'class': 'spacerButton inactive',
       'src': 'images/spacer_empty.svg'
     })
-    tool.append(this.spacer2)
+    tool.append(this.spacer1)
     // docker integration end
 
     this.filterbutton = jQuery('<img>', {
@@ -242,12 +236,6 @@ ToolBar.prototype.createButtons = function () {
     })
     tool.append(this.filterbutton) // Filter Button
     
-    this.spacer3 = jQuery('<img>', {
-      'class': 'spacerButton',
-      'src': 'images/spacer.svg'
-    })
-    tool.append(this.spacer3)
-      
     this.hidebutton = jQuery('<img>', {
       'title': 'Show/Hide Markups',
       'class': 'toolButton inactive',
@@ -255,12 +243,6 @@ ToolBar.prototype.createButtons = function () {
     })
     tool.append(this.hidebutton)
     
-    this.spacer4 = jQuery('<img>', {
-      'class': 'spacerButton',
-      'src': 'images/spacer.svg'
-    })
-    tool.append(this.spacer4)
-
     this.heatDownButton = jQuery('<img>', {
         'title': 'Decrease opacity',
         'class': 'toolButton inactive',
@@ -277,12 +259,6 @@ ToolBar.prototype.createButtons = function () {
     });
     tool.append(this.heatUpButton);	// Button for increasing opacity
       
-    this.spacer5 = jQuery('<img>', {
-      'class': 'spacerButton',
-      'src': 'images/spacer.svg'
-    })
-    tool.append(this.spacer5)
-
     this.colorMapButton = jQuery('<img>', {
       'class': 'colorMapButton',
       'title': 'ColorMap',
@@ -304,12 +280,6 @@ ToolBar.prototype.createButtons = function () {
     });
     tool.append(this.showWeightPanel);    // Button for showing the weight panel
       
-    this.spacer6 = jQuery('<img>', {
-      'class': 'spacerButton',
-      'src': 'images/spacer.svg'
-    })
-    tool.append(this.spacer6)
-
     this.freeMarkupButton = jQuery('<img>', {
       'title': 'Free line Markup',
       'class': 'toolButton inactive',
@@ -318,11 +288,11 @@ ToolBar.prototype.createButtons = function () {
     })
     tool.append(this.freeMarkupButton) 	  // Markup Pencil Tool
 
-    this.spacer7 = jQuery('<img>', {
+    this.spacer2 = jQuery('<img>', {
       'class': 'spacerButton inactive',
-      'src': 'images/spacer.svg'
+      'src': 'images/spacer_empty.svg'
     })
-    tool.append(this.spacer7)
+    tool.append(this.spacer2)
     
     this.switchUserButton = jQuery('<img>', {
         'title': 'Switch user',
@@ -332,17 +302,12 @@ ToolBar.prototype.createButtons = function () {
     });
     tool.append(this.switchUserButton);     // Button for decreasing opacity
       
-    this.spacer8 = jQuery('<img>', {
-      'class': 'spacerButton',
-      'src': 'images/spacer.svg'
-    })
-    tool.append(this.spacer8)
-
+      
     /*
      * Event handlers on click for the buttons
      */
     this.homebutton.on('click', function(){
-        window.location.href = "/";
+        window.location.href = "/select.php";
     }.bind(this))
     
     this.micbutton.on('click', function(){
@@ -465,7 +430,7 @@ ToolBar.prototype.createButtons = function () {
 
   this.titleButton = jQuery('<p>', {
     'class': 'titleButton',
-    'text': 'caMicroscope Lymphocyte'
+    'text': 'caMic Lymphocyte'
   })
   tool.append(this.titleButton)
 
