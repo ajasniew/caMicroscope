@@ -121,7 +121,7 @@ $_SESSION["name"] = "quip";
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4"><a class="btn btn-info btn-block" href="/lymphocyte/osdCamicroscope.php?tissueId=test1" data-toggle="tooltip" data-placement="bottom" title="Access Lymphocyte and Plasma Cell Annotation">caMicroscope Lymphocyte</a></div>
+                    <div class="col-md-4"><a class="btn btn-info btn-block" href="/lymphocyte/osdCamicroscope.php?tissueId=TCGA-28-1751-01Z-00-DX1" data-toggle="tooltip" data-placement="bottom" title="Access Lymphocyte and Plasma Cell Annotation">caMicroscope Lymphocyte</a></div>
                     <div class="col-md-8">Semi-automatic Lymphocyte and Plasma Cell Annotation.  Open a training image</b></div>
                 </div>
                 <div class="row"><br /></div>
